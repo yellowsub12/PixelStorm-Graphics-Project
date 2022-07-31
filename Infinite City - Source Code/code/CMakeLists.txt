@@ -26,6 +26,8 @@ file(GLOB SRC src/*.cpp)
 
 add_executable(${EXEC} ${SRC})
 
+target_include_directories(${EXEC} PRIVATE include)
+
 target_link_libraries(${EXEC} OpenGL::GL glew_s glfw glm)
 
 list(APPEND BIN ${EXEC})
@@ -33,4 +35,4 @@ list(APPEND BIN ${EXEC})
 
 # install files to install location
 install(TARGETS ${BIN} DESTINATION ${CMAKE_INSTALL_PREFIX})
-
+install(DIRECTORY ${ASSETS} DESTINATION ${CMAKE_INSTALL_PREFIX})
