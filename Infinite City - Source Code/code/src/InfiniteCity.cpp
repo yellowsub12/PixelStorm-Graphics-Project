@@ -370,6 +370,8 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
     //--Drawing Skybox (Should always be the last thing to be drawn in this render loop)-----------------------//
 
         glDepthFunc(GL_LEQUAL);
+        //glEnable(GL_BLEND);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glUseProgram(skyboxShaderProgram);
         glFrontFace(GL_CW);
@@ -384,16 +386,22 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         
 
         glActiveTexture(GL_TEXTURE0);
-        GLuint textureLocationS = glGetUniformLocation(skyboxShaderProgram, "skybox");
-        if(currentCityTime < 0)
-            glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTextureNight);
-        else
-            glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        GLuint textureLocationS = glGetUniformLocation(skyboxShaderProgram, "skyboxDay");
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
         glUniform1i(textureLocationS, 0);
+
+        glActiveTexture(GL_TEXTURE0+1);
+        textureLocationS = glGetUniformLocation(skyboxShaderProgram, "skyboxNight");
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTextureNight);
+        glUniform1i(textureLocationS, 1);
+
+        glUniform1f(glGetUniformLocation(skyboxShaderProgram, "time"), currentCityTime/dayNightCycleTime);
+
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glFrontFace(GL_CCW);
         glDepthFunc(GL_LESS);
+        //glDisable(GL_BLEND);
 
         // DO NOT DRAW ANYTHING AFTER THE SKYBOX, ONLY DRAW THINGS BEFORE THE SKYBOX
 

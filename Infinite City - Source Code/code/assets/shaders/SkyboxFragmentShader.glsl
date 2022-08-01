@@ -3,9 +3,14 @@ out vec4 FragColor;
 
 in vec3 TexCoords;
 
-uniform samplerCube skybox;
+uniform samplerCube skyboxDay;
+uniform samplerCube skyboxNight;
+
+uniform float time;
 
 void main()
-{    
-    FragColor = texture(skybox, TexCoords);
+{   
+
+	FragColor = texture(skyboxDay, TexCoords)* time 
+	+ texture(skyboxNight, TexCoords) * (1.0f - time);
 }
