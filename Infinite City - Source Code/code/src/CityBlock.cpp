@@ -13,7 +13,7 @@ CityBlock::CityBlock(int type, int size, int numTilesRows, vec3 location, GLuint
     mainTexture = texture;
     cubeVAO = createUnitCube(false);
     blockSeed = seed;
-    blockType = type;
+    blockType = type; 
 }
 
 void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation, GLuint buildingTexture)
