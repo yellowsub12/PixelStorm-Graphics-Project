@@ -6,7 +6,6 @@
 
 
 Camera::Camera(float camSpeed) {
-
 	position = vec3(0.0f, 10.0f, 0.0f);
 	lookAt = vec3(0.0f);
 	fov = 70.0f;
@@ -40,7 +39,7 @@ float Camera::Lerp(float a, float b, float f)
 void Camera::UpdateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, GLFWwindow* currentWindow)
 {
     
-    float dt = 0.02;
+    float dt = 0.02f;
     float cameraHorizontalAngle = 0.0f;
     float cameraVerticalAngle = 0.0f;
 
@@ -49,8 +48,8 @@ void Camera::UpdateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, 
 
     glfwGetCursorPos(currentWindow, &mousePosX, &mousePosY);
 
-    double dx = mousePosX - lastMousePosX;
-    double dy = mousePosY - lastMousePosY;
+    float dx = static_cast<float>(mousePosX - lastMousePosX);
+    float dy = static_cast<float>(mousePosY - lastMousePosY);
 
 
     // Convert to spherical coordinates
@@ -59,14 +58,9 @@ void Camera::UpdateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, 
 
     // Clamp vertical angle to [-85, 85] degrees
     cameraVerticalAngle = std::max(-85.0f, std::min(85.0f, cameraVerticalAngle));
-    if (cameraHorizontalAngle > 360)
-    {
-        cameraHorizontalAngle -= 360;
-    }
-    else if (cameraHorizontalAngle < -360)
-    {
-        cameraHorizontalAngle += 360;
-    }
+
+    // Clamp horizontal angle between 0 and 360
+    cameraHorizontalAngle = std::fmod(cameraHorizontalAngle, 360.0f);
 
     float theta = radians(cameraHorizontalAngle);
     float phi = radians(cameraVerticalAngle);
@@ -112,10 +106,10 @@ void Camera::UpdateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, 
 
     // Camera Zoom In/Out
     if (glfwGetMouseButton(currentWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-        fov -= 0.01;
+        fov = 70.0f + dy * 0.001f;
+        fov = std::max(69.2f, std::min(71.3f, fov));
     }
 
-    
     // Smoothly update camera position and look direction
     position = vec3(Lerp(position.x, newPosition.x, 0.1), Lerp(position.y, newPosition.y, 0.1), Lerp(position.z, newPosition.z, 0.1));
     lookAt = vec3(Lerp(lookAt.x, newLookAt.x, 0.1), Lerp(lookAt.y, newLookAt.y, 0.1), Lerp(lookAt.z, newLookAt.z, 0.1));

@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Directories
+Infinite City - Source Code/code/build/
+
+# Others
+Infinite City - Source Code/code/.vscode/settings.json
