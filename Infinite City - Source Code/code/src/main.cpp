@@ -17,6 +17,7 @@
 #include <Camera.h>
 #include <InfiniteCity.h>
 
+
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
 #include <GL/glew.h>    // Include GLEW - OpenGL Extension Wrangler
 
@@ -61,6 +62,8 @@ int main(int argc, char* argv[])
         glfwTerminate();
         return -1;
     }
+
+
 
     float camSpeed = 10.0f; // Speed with which the camera will move in the city
 

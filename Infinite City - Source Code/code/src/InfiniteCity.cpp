@@ -6,6 +6,7 @@
 #include <iostream>
 #include <Shader.h>
 #include <random>
+#include "Model.h"
 
 using namespace std;
 
@@ -91,6 +92,7 @@ void InfiniteCity::SpawnColumnBlocks(int columnNumber, int direction, int frontR
 
 void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuint shadowShaderProgram)
 {
+    Initialize();
     planeVAO = createUnitPlane();
     int skyboxVAO = createUnitCubeReversed();
 
@@ -120,7 +122,6 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
     GLuint groundTextureID = loadTexture((texturesPathPrefix + "ground.png").c_str());
     GLuint oceanTextureID = loadTexture((texturesPathPrefix + "ocean.jpg").c_str());
     GLuint oceanNightTextureID = loadTexture((texturesPathPrefix + "ocean_night.jpg").c_str());
-    GLuint buildingTexture = loadTexture((texturesPathPrefix + "building.jpg").c_str());
 
     // Array of texture paths pertaining to the day skybox textures
     vector<std::string> dayFaces
@@ -364,9 +365,8 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
             if ((abs(dotproduct) > 0.75 &&  distanceFromCamera < 50.0f) || distanceFromCamera < 10.0f)
             {
                 glBindVertexArray(planeVAO);
-                block.DrawBlock(sceneShaderProgram, worldMatrixLocation1, actualTextureLocation,buildingTexture);
+                block.DrawBlock(sceneShaderProgram, worldMatrixLocation1, actualTextureLocation);
             }
-            
         }
 
         // Here we start drawing the ocean plane
