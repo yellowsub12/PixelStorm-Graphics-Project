@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    int WIDTH = 1920, HEIGHT = 1080;
+    int WIDTH = 1920, HEIGHT = 1080; //Setting the resolution of the program window. 
 
     // Create Window and rendering context using GLFW, resolution is 1024x768
     GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Infinite City", NULL, NULL);
@@ -62,22 +62,36 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    Camera mainCamera; 
+    float camSpeed = 10.0f; // Speed with which the camera will move in the city
 
-    InfiniteCity city(5, 5, 5, mainCamera);
+    
+    Camera mainCamera(camSpeed); // The main camera that will 
+    long infiniteCitySeed = time(NULL); // The overall starting seed of the city - This seed will entirely define the uniqueness of the looks of the city.
+    int cityStartingLength = 5; // How many blocks long is the city at the start of the program (before the city grows as we move around)?
+    int cityStartingWidth = 5;  // How many blocks wide is the city at the start of the program (before the city grows as we move around)?
+    int blockSize = 5; // Size of each block in the city, a block will contain elements on it such as buildings, parks, trees, etc. A building block of the city. 
 
-    string shaderPathPrefix = "assets/shaders/";
+
+    srand(infiniteCitySeed); // Seeding the random number generator with our city seed so every rand() call will generate the same random numbers in the same sequence. 
+    cout << "The seed for this Infinite City is *drum roll*: " << (int)infiniteCitySeed << endl; // Prints the seed to the console for later reference 
+
+    InfiniteCity city(cityStartingWidth, cityStartingLength, blockSize, mainCamera, infiniteCitySeed); // Creating a new City object that will hold every single element and function of the city
+
+    // Creating simple string variables to hold the path strings for the folders that contain the shaders and textures
+    string shaderPathPrefix = "assets/shaders/"; 
     string texturesPathPrefix = "assets/textures/";
 
-    // Compile and link shaders here ...
+    // Compiling and linking the two shaders here ...
     GLuint texturedShaderProgram = CreateShader(shaderPathPrefix + "TexturedVertexShader.glsl", shaderPathPrefix + "TexturedFragmentShader.glsl");
     GLuint shadowShaderProgram = CreateShader(shaderPathPrefix + "ShadowVertexShader.glsl", shaderPathPrefix + "ShadowFragmentShader.glsl");
 
+    // The actual main render loop of the program. The city object has a DrawCity method that will initiate the render window and begin the program. 
+    // Begins the program.
     city.DrawCity(window, texturedShaderProgram, shadowShaderProgram);
 
-    // Shutdown GLFW
+    // Shutdown GLFW when the render loop in the DrawCity method above is over, meaning the program has begun exiting. 
     glfwTerminate();
 
-    return 0;
+    return 0; // Return 0 cause this is int main and not void main ;)
 }
 

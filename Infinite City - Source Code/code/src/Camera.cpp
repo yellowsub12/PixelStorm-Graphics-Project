@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-Camera::Camera() {
+Camera::Camera(float camSpeed) {
 
 	position = vec3(0.0f, 10.0f, 0.0f);
 	lookAt = vec3(0.0f);
@@ -14,7 +14,19 @@ Camera::Camera() {
 	newLookAt = lookAt;
     cameraAngularSpeed = 10.0f;
     cameraUp = vec3(0.0f, 1.0f, 0.0f);
-    cameraSpeed = 50.0f;
+    cameraSpeed = camSpeed;
+}
+
+Camera::Camera(Camera &copyCam) {
+
+    position = copyCam.position;
+    lookAt = copyCam.lookAt;
+    fov = copyCam.fov;
+    newPosition = position;
+    newLookAt = lookAt;
+    cameraAngularSpeed = copyCam.cameraAngularSpeed;
+    cameraUp = vec3(0.0f, 1.0f, 0.0f);
+    cameraSpeed = copyCam.cameraSpeed;
 }
 
 float Camera::Lerp(float a, float b, float f)
@@ -63,7 +75,8 @@ void Camera::UpdateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, 
 
 
     vec3 frontVector = normalize(newLookAt);
-    vec3 sideVector = cross(frontVector, cameraUp);
+    vec3 sideVector = normalize(cross(frontVector, cameraUp));
+    //std::cout << frontVector.x << std::endl;
 
     if (length(newPosition) <= 1000)
     {

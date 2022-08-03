@@ -24,10 +24,13 @@ public:
 	float cameraAngularSpeed;
 	float cameraSpeed;
 
-	Camera();
+	Camera(float camSpeed); // Paramterized constructor
+	Camera(Camera &copyCam); // Copy Constructor 
 
+	// Method to linearly interpolate between two floats
 	float Lerp(float a, float b, float f);
 
+	// Method that updates the camera data and actually helps us control the camera. Contains all data and input handling related to Camera movement
 	void UpdateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, GLFWwindow* currentWindow);
 };
 

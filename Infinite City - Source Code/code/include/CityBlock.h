@@ -16,15 +16,22 @@ class CityBlock
 {
 public:
 	int blockSize;
-	int numOfTiles;
+	int numOfTileRows;
 	vec3 blockLocation;
 	GLuint mainTexture;
+	GLuint buildingTexture;
+	GLuint cubeVAO;
+	int blockSeed;
+	int blockType;
 
-	CityBlock(int size, int numTiles, vec3 location, GLuint texture);
+	// Parameterized constructor
+	CityBlock(int type, int size, int numTilesRows, vec3 location, GLuint texture, int seed);
 
-	void GenerateTiles();
+	// Generates the actual elements on each block such as buildings, trees, etc
+	void GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation, GLuint buildingTexture);
 
-	void DrawBlock(GLuint shaderProgram, GLuint worldMatrixLocation);
+	// Draw this block in the world
+	void DrawBlock(GLuint shaderProgram, GLuint worldMatrixLocation, GLuint textureLocation, GLuint buildingTexture);
 
 };
 
