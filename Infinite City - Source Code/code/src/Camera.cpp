@@ -22,6 +22,7 @@ Camera::Camera(Camera &copyCam) {
     cameraAngularSpeed = copyCam.cameraAngularSpeed;
     cameraUp = vec3(0.0f, 1.0f, 0.0f);
     cameraSpeed = copyCam.cameraSpeed;
+    cameraVerticalLimits = copyCam.cameraVerticalLimits;
 }
 
 void Camera::UpdateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, GLFWwindow* currentWindow) {
