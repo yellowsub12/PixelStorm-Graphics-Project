@@ -18,11 +18,10 @@ public:
 	vec3 position;
 	vec3 lookAt;
 	float fov;
-	vec3 newPosition;
-	vec3 newLookAt;
 	vec3 cameraUp;
 	float cameraAngularSpeed;
 	float cameraSpeed;
+	float cameraVerticalLimits;
 
 	Camera(float camSpeed); // Paramterized constructor
 	Camera(Camera &copyCam); // Copy Constructor 
@@ -32,5 +31,6 @@ public:
 
 	// Method that updates the camera data and actually helps us control the camera. Contains all data and input handling related to Camera movement
 	void UpdateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, GLFWwindow* currentWindow);
+	GLFWscrollfun mouseWheel(int, int, int, int);
 };
 

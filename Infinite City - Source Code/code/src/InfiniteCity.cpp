@@ -189,7 +189,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         nbFrames++;
         if (currentTime - lastTime >= 1.0) { // If last prinf() was more than 1 sec ago
             // printf and reset timer
-            printf("%f ms/frame\n", 1000.0 / double(nbFrames));
+            printf("%f ms/frame\n", 1000.0/double(nbFrames));
             nbFrames = 0;
             lastTime += 1.0;
         }
@@ -281,27 +281,27 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
         
         // The following if-statements handle the spawning of more blocks when the camera moves towards the edges of the city
-        if (mainCamera.newPosition.x > xSpawnFrontLocation)
+        if (mainCamera.position.x > xSpawnFrontLocation)
         {
             currentFrontRows++;
             xSpawnFrontLocation += blockSize;
             SpawnRowBlocks(currentFrontRows, 1, currentFrontColumns, currentBackColumns);
         }
-        if (mainCamera.newPosition.x < xSpawnBackLocation)
+        if (mainCamera.position.x < xSpawnBackLocation)
         {
             currentBackRows++;
             xSpawnBackLocation -= blockSize;
             SpawnRowBlocks(currentBackRows, -1, currentFrontColumns, currentBackColumns);
 
         }
-        if (mainCamera.newPosition.z > zSpawnFrontLocation)
+        if (mainCamera.position.z > zSpawnFrontLocation)
         {
             currentFrontColumns++;
             zSpawnFrontLocation += blockSize;
             SpawnColumnBlocks(currentFrontColumns, 1, currentFrontRows, currentBackRows);
 
         }
-        if (mainCamera.newPosition.z < zSpawnBackLocation)
+        if (mainCamera.position.z < zSpawnBackLocation)
         {
             currentBackColumns++;
             zSpawnBackLocation -= blockSize;
@@ -355,8 +355,8 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         for (auto block : totalBlocks)
         {
             // Variables to calculate distance and dot product between the camera and the individual blocks
-            vec3 cameraToBlock = block.blockLocation - mainCamera.newPosition;
-            vec3 cameraLookAt = normalize(mainCamera.newLookAt);
+            vec3 cameraToBlock = block.blockLocation - mainCamera.position;
+            vec3 cameraLookAt = normalize(mainCamera.lookAt);
             float dotproduct = dot(cameraToBlock, cameraLookAt);
             float distanceFromCamera = length(vec3(cameraToBlock.x, 0.0f, cameraToBlock.z));
 
