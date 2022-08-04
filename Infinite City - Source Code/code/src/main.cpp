@@ -1,14 +1,12 @@
 //  COMP 371 - Summer 2 2022 
-//
 //  Project Infinite City - August 8th, 2022
 // 
 //  Team Members:
-//  Anas Peerzada - 40040127
-//  Kevin Ve - 40032669
-//  Samaninder Singh - 40133493
-//  Ali Turkman - 40111059
-//  Ye Tun - 40007224
-//
+//  40040127 - Anas Peerzada     
+//  40032669 - Kevin Ve          
+//  40133493 - Samaninder Singh  
+//  40111059 - Ali Turkman       
+//  40007224 - Ye Tun            
 
 #include <iostream>
 #include <Shader.h>
@@ -16,7 +14,7 @@
 #include <shapes.h>
 #include <Camera.h>
 #include <InfiniteCity.h>
-
+#include <constants.hpp>
 
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
 #include <GL/glew.h>    // Include GLEW - OpenGL Extension Wrangler
@@ -32,7 +30,6 @@
 using namespace glm;
 using namespace std;
 
-
 int main(int argc, char* argv[])
 {
     // Initialize GLFW and OpenGL version
@@ -43,10 +40,8 @@ int main(int argc, char* argv[])
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    int WIDTH = 1920, HEIGHT = 1080; //Setting the resolution of the program window. 
-
-    // Create Window and rendering context using GLFW, resolution is 1024x768
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Infinite City", NULL, NULL);
+    // Create Window and rendering context using GLFW
+    GLFWwindow* window = glfwCreateWindow(constant::SCREEN_WIDTH, constant::SCREEN_HEIGHT, "Infinite City", NULL, NULL);
     if (window == NULL)
     {
         std::cerr << "Failed to create GLFW window" << std::endl;
@@ -63,22 +58,14 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-
-
-    float camSpeed = 10.0f; // Speed with which the camera will move in the city
-
-    
-    Camera mainCamera(camSpeed); // The main camera that will 
-    long infiniteCitySeed = static_cast<long>(time(NULL)); // The overall starting seed of the city - This seed will entirely define the uniqueness of the looks of the city.
+    Camera mainCamera; // The main camera that will 
     int cityStartingLength = 5; // How many blocks long is the city at the start of the program (before the city grows as we move around)?
     int cityStartingWidth = 5;  // How many blocks wide is the city at the start of the program (before the city grows as we move around)?
-    int blockSize = 10; // Size of each block in the city, a block will contain elements on it such as buildings, parks, trees, etc. A building block of the city. 
+    int blockSize = 5; // Size of each block in the city, a block will contain elements on it such as buildings, parks, trees, etc. A building block of the city. 
 
+    cout << "Current Seed: " << constant::PROCEDURAL_SEED << endl; // Prints the seed to the console for later reference 
 
-    srand(infiniteCitySeed); // Seeding the random number generator with our city seed so every rand() call will generate the same random numbers in the same sequence. 
-    cout << "The seed for this Infinite City is *drum roll*: " << (int)infiniteCitySeed << endl; // Prints the seed to the console for later reference 
-
-    InfiniteCity city(cityStartingWidth, cityStartingLength, blockSize, mainCamera, infiniteCitySeed); // Creating a new City object that will hold every single element and function of the city
+    InfiniteCity city(cityStartingWidth, cityStartingLength, blockSize, mainCamera, (int)constant::PROCEDURAL_SEED); // Creating a new City object that will hold every single element and function of the city
 
     // Creating simple string variables to hold the path strings for the folders that contain the shaders and textures
     string shaderPathPrefix = "assets/shaders/"; 
@@ -97,4 +84,3 @@ int main(int argc, char* argv[])
 
     return 0; // Return 0 cause this is int main and not void main ;)
 }
-

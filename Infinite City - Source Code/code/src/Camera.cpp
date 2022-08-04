@@ -3,15 +3,16 @@
 #define GLEW_STATIC 1
 #include <GL/glew.h>   
 #include <iostream>
+#include <constants.hpp>
 
 
-Camera::Camera(float camSpeed) {
-	position = vec3(10.0f, 10.0f, 10.0f);
+Camera::Camera() {
+	position = vec3(0.0f, 10.0f, 0.0f);
 	lookAt = vec3(0.0f);
 	fov = 70.0f;
     cameraAngularSpeed = 10.0f;
     cameraUp = vec3(0.0f, 1.0f, 0.0f);
-    cameraSpeed = camSpeed;
+    cameraSpeed = constant::SLOW_CAMERA_SPEED;
     cameraVerticalLimits = 85.0f;
 }
 
