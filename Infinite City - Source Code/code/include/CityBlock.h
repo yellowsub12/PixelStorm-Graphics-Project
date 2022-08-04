@@ -16,15 +16,20 @@ class CityBlock
 {
 public:
 	int blockSize;
-	int numOfTiles;
+	int numOfTileRows;
 	vec3 blockLocation;
 	GLuint mainTexture;
+	int blockSeed;
+	int blockType; // Type of the block is an int value. Values of 0 to 3 means the block is a road type with one of 4 road textures on it, whereas a type of 4 means the block is a grass type and has a grass texture on it. 
 
-	CityBlock(int size, int numTiles, vec3 location, GLuint texture);
+	// Parameterized constructor
+	CityBlock(int type, int size, int numTilesRows, vec3 location, GLuint texture, int seed);
 
-	void GenerateTiles();
+	// Generates the actual elements on each block such as buildings, trees, etc
+	void GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation);
 
-	void DrawBlock(GLuint shaderProgram, GLuint worldMatrixLocation);
+	// Draw this block in the world
+	void DrawBlock(GLuint shaderProgram, GLuint worldMatrixLocation, GLuint textureLocation);
 
 };
 

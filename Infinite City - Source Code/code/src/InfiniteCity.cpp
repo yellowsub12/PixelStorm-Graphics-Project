@@ -6,10 +6,11 @@
 #include <iostream>
 #include <Shader.h>
 #include <random>
+#include "Model.h"
 
 using namespace std;
 
-InfiniteCity::InfiniteCity(int width, int length, int sizeBlock, Camera newCam)
+InfiniteCity::InfiniteCity(int width, int length, int sizeBlock, Camera newCam, int seed) : mainCamera(newCam)
 {
 	cityLength = length;
 	cityWidth = width;
@@ -20,7 +21,7 @@ InfiniteCity::InfiniteCity(int width, int length, int sizeBlock, Camera newCam)
     xSpawnBackLocation = - width/2;
     GenerateTextureArray();
 	SpawnStartingBlocks();
-    mainCamera = newCam; 
+    citySeed = seed;
 }
 
 void InfiniteCity::GenerateTextureArray()
@@ -31,14 +32,15 @@ void InfiniteCity::GenerateTextureArray()
     GLuint cityBlock2TextureID = loadTexture((texturesPathPrefix + "cityblock2.png").c_str());
     GLuint cityBlock3TextureID = loadTexture((texturesPathPrefix + "cityblock3.png").c_str());
     GLuint cityBlock4TextureID = loadTexture((texturesPathPrefix + "cityblock4.png").c_str());
-    GLuint cityBlock5TextureID = loadTexture((texturesPathPrefix + "cityblock5.png").c_str());
     GLuint grassTextureID = loadTexture((texturesPathPrefix + "ground.png").c_str());
+    GLuint sTowerBaseTextureID = loadTexture((texturesPathPrefix + "SpaceTowerBase.jpg").c_str());
 
     cityBlockTextures[0] = cityBlock1TextureID;
     cityBlockTextures[1] = cityBlock2TextureID;
     cityBlockTextures[2] = cityBlock3TextureID;
     cityBlockTextures[3] = cityBlock4TextureID;
     cityBlockTextures[4] = grassTextureID;
+    cityBlockTextures[5] = sTowerBaseTextureID;
 }
 
 void InfiniteCity::SpawnStartingBlocks()
@@ -55,12 +57,18 @@ void InfiniteCity::SpawnStartingBlocks()
     else           
         columns = cityLength / 2 + 1;
 
+
 	for (int i = -cityWidth/2; i < rows; i++)
 	{
 		for (int j = -cityLength/2; j < columns; j++)
 		{
 			vec3 newBlockLocation = vec3(i*blockSize, 0.0f, j*blockSize);
-			totalBlocks.push_back(CityBlock(blockSize, 3, newBlockLocation, cityBlockTextures[rand() % 5]));
+            //srand(citySeed * (i * blockSize * j));
+            int randomFactor = rand() % 5;
+            if(i == 0 && j == 0)
+                totalBlocks.push_back(CityBlock(5, blockSize, 3, newBlockLocation, cityBlockTextures[5], citySeed));
+            else
+                totalBlocks.push_back(CityBlock(randomFactor, blockSize, 3, newBlockLocation, cityBlockTextures[randomFactor], citySeed));
 		}
 	}
 }
@@ -70,7 +78,9 @@ void InfiniteCity::SpawnRowBlocks(int rowNumber, int direction, int frontColumns
     for (int i = -backColumns; i < (frontColumns+1); i++)
     {
        vec3 newBlockLocation = vec3(direction*rowNumber*blockSize, 0.0f, i * blockSize);
-       totalBlocks.push_back(CityBlock(blockSize, 3, newBlockLocation, cityBlockTextures[rand() % 5]));
+       //srand(citySeed + (rowNumber * blockSize * i * direction));
+       int randomFactor = rand() % 5;
+       totalBlocks.push_back(CityBlock(randomFactor, blockSize, 3, newBlockLocation, cityBlockTextures[randomFactor], citySeed));
     }
 }
 
@@ -79,40 +89,46 @@ void InfiniteCity::SpawnColumnBlocks(int columnNumber, int direction, int frontR
     for (int i = -backRows; i < (frontRows+1); i++)
     {
         vec3 newBlockLocation = vec3(i * blockSize, 0.0f, direction * columnNumber * blockSize);
-        totalBlocks.push_back(CityBlock(blockSize, 3, newBlockLocation, cityBlockTextures[rand() % 5]));
+        //srand(citySeed + (columnNumber*blockSize*i*direction));
+        int randomFactor = rand() % 5;
+        totalBlocks.push_back(CityBlock(randomFactor, blockSize, 3, newBlockLocation, cityBlockTextures[randomFactor], citySeed));
     }
 }
 
 void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuint shadowShaderProgram)
 {
+    Initialize();
     planeVAO = createUnitPlane();
     int skyboxVAO = createUnitCubeReversed();
 
+    // Setting the number of rows in the city at the beginning of the program
     int currentFrontRows = cityWidth / 2;
     int currentBackRows = cityWidth / 2;
     int currentFrontColumns = cityLength / 2;
     int currentBackColumns = cityLength / 2;
 
-    float oceanHorizontalScale = 1000;
+    float oceanHorizontalScale = 1000; // Scale of the ocean, i.e how much the ocean plane scales into the distance from the city
 
+    // Data for the Shadow Map
     GLuint depth_map_texture;
     glGenTextures(1, &depth_map_texture);
 
     GLuint depth_map_fbo;
     glGenFramebuffers(1, &depth_map_fbo);
 
+    // Creating simple string variables to hold the path strings for the folders that contain the shaders and textures
     string texturesPathPrefix = "assets/textures/";
     string shadersPathPrefix = "assets/shaders/";
 
+    // Creating the skybox shader with which we'll render the skybox
     GLuint skyboxShaderProgram = CreateShader(shadersPathPrefix+"SkyboxVertexShader.glsl", shadersPathPrefix + "SkyboxFragmentShader.glsl");
 
-
+    // Creating all important textures required for the city
     GLuint groundTextureID = loadTexture((texturesPathPrefix + "ground.png").c_str());
     GLuint oceanTextureID = loadTexture((texturesPathPrefix + "ocean.jpg").c_str());
     GLuint oceanNightTextureID = loadTexture((texturesPathPrefix + "ocean_night.jpg").c_str());
 
-    
-
+    // Array of texture paths pertaining to the day skybox textures
     vector<std::string> dayFaces
     {
         texturesPathPrefix+"skybox/right.png",
@@ -123,6 +139,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         texturesPathPrefix+"skybox/back.png"
     };
 
+    // Array of texture paths pertaining to the night skybox textures
     vector<std::string> nightFaces
     {
         texturesPathPrefix + "skybox/Night Skybox Textures/right.png",
@@ -136,6 +153,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
     unsigned int cubemapTexture = loadCubemap(dayFaces);
     unsigned int cubemapTextureNight = loadCubemap(nightFaces);
 
+    // Adding important memory locations for uniform shader variables
     GLuint viewMatrixLocation = glGetUniformLocation(sceneShaderProgram, "viewMatrix");
     GLuint projectionMatrixLocation = glGetUniformLocation(sceneShaderProgram, "projectionMatrix");
     GLuint viewMatrixLocationS = glGetUniformLocation(skyboxShaderProgram, "viewMatrix");
@@ -143,6 +161,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
     GLuint worldMatrixLocation1 = glGetUniformLocation(sceneShaderProgram, "worldMatrix");
     GLuint worldMatrixLocation2 = glGetUniformLocation(shadowShaderProgram, "worldMatrix");
     GLuint worldMatrixLocationS = glGetUniformLocation(skyboxShaderProgram, "worldMatrix");
+    GLuint actualTextureLocation = glGetUniformLocation(sceneShaderProgram, "actualTexture");
 
 
     //Important Light Parameters
@@ -151,9 +170,10 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
     const float specular = 0.3f;
 
     //Useful City Parameters
-    float dayNightCycleTime = 100.0f;
-    float currentCityTime = 0;
+    float dayNightCycleTime = 100.0f; // Total time in each day of the life of Infinite City
+    float currentCityTime = 0; // current time in the Infinite City
 
+    // Disable the cursor
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
@@ -161,9 +181,10 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
     // Enable Backface culling
     glEnable(GL_CULL_FACE);
 
-    // @TODO 1 - Enable Depth Test
+    // Enable Depth Test
     glEnable(GL_DEPTH_TEST);
 
+    // For framerate calculation
     double lastTime = glfwGetTime();
     int nbFrames = 0;
 
@@ -173,12 +194,12 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         nbFrames++;
         if (currentTime - lastTime >= 1.0) { // If last prinf() was more than 1 sec ago
             // printf and reset timer
-            printf("%f ms/frame\n", 1000.0 / double(nbFrames));
+            printf("%f ms/frame\n", 1000.0/double(nbFrames));
             nbFrames = 0;
             lastTime += 1.0;
         }
 
-        currentCityTime = dayNightCycleTime * sinf(currentTime);
+        currentCityTime = dayNightCycleTime * sinf(currentTime*0.1); // Update the time in the city
 
 
         /*int WIDTH, HEIGHT;
@@ -264,31 +285,28 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         glClear(GL_DEPTH_BUFFER_BIT);*/
 
         
-
-        if (mainCamera.newPosition.x > xSpawnFrontLocation)
+        // The following if-statements handle the spawning of more blocks when the camera moves towards the edges of the city
+        if (mainCamera.position.x > xSpawnFrontLocation)
         {
             currentFrontRows++;
             xSpawnFrontLocation += blockSize;
             SpawnRowBlocks(currentFrontRows, 1, currentFrontColumns, currentBackColumns);
         }
-
-        if (mainCamera.newPosition.x < xSpawnBackLocation)
+        if (mainCamera.position.x < xSpawnBackLocation)
         {
             currentBackRows++;
             xSpawnBackLocation -= blockSize;
             SpawnRowBlocks(currentBackRows, -1, currentFrontColumns, currentBackColumns);
 
         }
-
-        if (mainCamera.newPosition.z > zSpawnFrontLocation)
+        if (mainCamera.position.z > zSpawnFrontLocation)
         {
             currentFrontColumns++;
             zSpawnFrontLocation += blockSize;
             SpawnColumnBlocks(currentFrontColumns, 1, currentFrontRows, currentBackRows);
 
         }
-
-        if (mainCamera.newPosition.z < zSpawnBackLocation)
+        if (mainCamera.position.z < zSpawnBackLocation)
         {
             currentBackColumns++;
             zSpawnBackLocation -= blockSize;
@@ -331,36 +349,53 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         glUniform1f(glGetUniformLocation(sceneShaderProgram, "time"), currentTime);
         glUniform1f(glGetUniformLocation(sceneShaderProgram, "shouldScroll"), false);
 
+        // Assigning the respective textures to the shader
         glActiveTexture(GL_TEXTURE0);
         GLuint textureLocation = glGetUniformLocation(sceneShaderProgram, "shadow_map");
         glBindTexture(GL_TEXTURE_2D, depth_map_texture);
         glUniform1i(textureLocation, 0);
         GLuint textureLocation1 = glGetUniformLocation(sceneShaderProgram, "actualTexture");
 
-        glBindVertexArray(planeVAO);
-
+        // Iterator to iterate through the totalBlocks array (array that contains all block of the city) and draw them one by one. 
         for (auto block : totalBlocks)
         {
-            block.DrawBlock(sceneShaderProgram, worldMatrixLocation1);
+            // Variables to calculate distance and dot product between the camera and the individual blocks
+            vec3 cameraToBlock = block.blockLocation - mainCamera.position;
+            vec3 cameraLookAt = normalize(mainCamera.lookAt);
+            float dotproduct = dot(cameraToBlock, cameraLookAt);
+            float distanceFromCamera = length(vec3(cameraToBlock.x, 0.0f, cameraToBlock.z));
+
+            // Render the the block only if its is within view (dotproduct) or if it is within 50.0f units from the camera
+            // However, if the block is within 10.0f units from the camera, it will render no matter what. 
+            if ((abs(dotproduct) > 0.75 &&  distanceFromCamera < 50.0f) || distanceFromCamera < 10.0f)
+            {
+                glBindVertexArray(planeVAO);
+                block.DrawBlock(sceneShaderProgram, worldMatrixLocation1, actualTextureLocation);
+            }
         }
-        
-        glUniform1i(glGetUniformLocation(sceneShaderProgram, "uvMultiplier"), 1000);
 
-        glUniform1f(glGetUniformLocation(sceneShaderProgram, "shouldScroll"), true);
+        // Here we start drawing the ocean plane
+        glBindVertexArray(planeVAO);
 
-        if(currentCityTime < 0)
+        glUniform1i(glGetUniformLocation(sceneShaderProgram, "uvMultiplier"), 1000); // Repeating the ocean texture on the ocean plane
+        glUniform1f(glGetUniformLocation(sceneShaderProgram, "shouldScroll"), true); // Turning on texture scrolling to give the ocean the illusion of movement. 
+
+        // Switch between night and day version of the ocean texture depending on the time (currentCityTime)
+        if(currentCityTime <= 0) // Night
             glBindTexture(GL_TEXTURE_2D, oceanNightTextureID);
-        else
+        else // Day
             glBindTexture(GL_TEXTURE_2D, oceanTextureID);
         glUniform1i(textureLocation1, 1);
+
+        // World matrix to position and scale the ocean plane
         mat4 oceanWorldMatrix = translate(mat4(1.0f), vec3(0.0f, -2.0f, 0.0f)) 
             * scale(mat4(1.0f), vec3(10000.0f, 1.0f, 10000.0f));
         glUniformMatrix4fv(worldMatrixLocation1, 1, GL_FALSE, &oceanWorldMatrix[0][0]);
 
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, 6); // Draw the plane
 
+        // This resets the view matrix of the shader so the city blocks aren't affected by the view matrix we set above for the ocean plane. 
         mat4 resetMatrix = lookAt(mainCamera.position, mainCamera.position + mainCamera.lookAt, mainCamera.cameraUp);
-
         glUniformMatrix4fv(worldMatrixLocation1, 1, GL_FALSE, &resetMatrix[0][0]);
 
         glBindVertexArray(0);
@@ -370,6 +405,8 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
     //--Drawing Skybox (Should always be the last thing to be drawn in this render loop)-----------------------//
 
         glDepthFunc(GL_LEQUAL);
+        //glEnable(GL_BLEND);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glUseProgram(skyboxShaderProgram);
         glFrontFace(GL_CW);
@@ -384,16 +421,22 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         
 
         glActiveTexture(GL_TEXTURE0);
-        GLuint textureLocationS = glGetUniformLocation(skyboxShaderProgram, "skybox");
-        if(currentCityTime < 0)
-            glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTextureNight);
-        else
-            glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        GLuint textureLocationS = glGetUniformLocation(skyboxShaderProgram, "skyboxDay");
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
         glUniform1i(textureLocationS, 0);
+
+        glActiveTexture(GL_TEXTURE0+1);
+        textureLocationS = glGetUniformLocation(skyboxShaderProgram, "skyboxNight");
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTextureNight);
+        glUniform1i(textureLocationS, 1);
+
+        glUniform1f(glGetUniformLocation(skyboxShaderProgram, "time"), currentCityTime/dayNightCycleTime);
+
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glFrontFace(GL_CCW);
         glDepthFunc(GL_LESS);
+        //glDisable(GL_BLEND);
 
         // DO NOT DRAW ANYTHING AFTER THE SKYBOX, ONLY DRAW THINGS BEFORE THE SKYBOX
 
@@ -412,7 +455,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         
 	}
 
-    totalBlocks.clear();
+    totalBlocks.clear(); // Empty the blocks array once the render loop is over and the program is being closed. 
 
 
 }

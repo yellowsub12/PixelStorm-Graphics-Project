@@ -59,13 +59,14 @@ int createUnitCube(bool frontFaceOpaque)
         frontFaceOpacity = 1.0f;
 
     vec3 vertexArray[] = {
-        vec3(-0.5f,-0.5f,-0.5f), vec3(-1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), // back face
-        vec3(-0.5f,-0.5f, 0.5f), vec3(-1.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 1.0f),
-        vec3(-0.5f, 0.5f, 0.5f), vec3(-1.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f),
 
-        vec3(-0.5f,-0.5f,-0.5f), vec3(-1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f),
-        vec3(-0.5f, 0.5f, 0.5f), vec3(-1.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f),
-        vec3(-0.5f, 0.5f,-0.5f), vec3(-1.0f, 0.0f, 0.0f), vec3(1.0f, 0.0f, 1.0f),
+        vec3(-0.5f, 0.5f,-0.5f),  vec3(-1.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 1.0f), // back face
+        vec3(-0.5f, -0.5f,-0.5f), vec3(-1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f),
+        vec3(-0.5f, -0.5f, 0.5f), vec3(-1.0f, 0.0f, 0.0f), vec3(1.0f, 0.0f, 1.0f),
+
+        vec3(-0.5f, 0.5f, 0.5f), vec3(-1.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), 
+        vec3(-0.5f, 0.5f,-0.5f), vec3(-1.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 1.0f),
+        vec3(-0.5f,-0.5f, 0.5f), vec3(-1.0f, 0.0f, 0.0f), vec3(1.0f, 0.0f, 1.0f),
 
         vec3(0.5f, 0.5f,-0.5f),  vec3(0.0f, 0.0f, -1.0f), vec3(1.0f, 1.0f, 1.0f), // right face
         vec3(-0.5f,-0.5f,-0.5f), vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 0.0f, 1.0f),
@@ -91,13 +92,13 @@ int createUnitCube(bool frontFaceOpaque)
         vec3(-0.5f, 0.5f, 0.5f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, frontFaceOpacity),
         vec3(0.5f,-0.5f, 0.5f),  vec3(0.0f, 0.0f, 1.0f), vec3(1.0f, 0.0f, frontFaceOpacity),
 
-        vec3(0.5f, 0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), // front face
-        vec3(0.5f,-0.5f,-0.5f),  vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f),
-        vec3(0.5f, 0.5f,-0.5f),  vec3(1.0f, 0.0f, 0.0f), vec3(1.0f, 0.0f, 1.0f),
+        vec3(0.5f, 0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 1.0f), // front face
+        vec3(0.5f,-0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f),
+        vec3(0.5f,-0.5f,-0.5f),  vec3(1.0f, 0.0f, 0.0f), vec3(1.0f, 0.0f, 1.0f),
 
-        vec3(0.5f,-0.5f,-0.5f),  vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f),
-        vec3(0.5f, 0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f),
-        vec3(0.5f,-0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 1.0f),
+        vec3(0.5f, 0.5f,-0.5f),  vec3(1.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), 
+        vec3(0.5f, 0.5f, 0.5f),  vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 1.0f),
+        vec3(0.5f,-0.5f,-0.5f),  vec3(1.0f, 0.0f, 0.0f), vec3(1.0f, 0.0f, 1.0f),
 
         vec3(0.5f, 0.5f, 0.5f),  vec3(0.0f, 1.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), // top face
         vec3(0.5f, 0.5f,-0.5f),  vec3(0.0f, 1.0f, 0.0f), vec3(1.0f, 0.0f, 1.0f),
