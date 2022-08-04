@@ -33,12 +33,14 @@ void InfiniteCity::GenerateTextureArray()
     GLuint cityBlock3TextureID = loadTexture((texturesPathPrefix + "cityblock3.png").c_str());
     GLuint cityBlock4TextureID = loadTexture((texturesPathPrefix + "cityblock4.png").c_str());
     GLuint grassTextureID = loadTexture((texturesPathPrefix + "ground.png").c_str());
+    GLuint sTowerBaseTextureID = loadTexture((texturesPathPrefix + "SpaceTowerBase.jpg").c_str());
 
     cityBlockTextures[0] = cityBlock1TextureID;
     cityBlockTextures[1] = cityBlock2TextureID;
     cityBlockTextures[2] = cityBlock3TextureID;
     cityBlockTextures[3] = cityBlock4TextureID;
     cityBlockTextures[4] = grassTextureID;
+    cityBlockTextures[5] = sTowerBaseTextureID;
 }
 
 void InfiniteCity::SpawnStartingBlocks()
@@ -63,7 +65,10 @@ void InfiniteCity::SpawnStartingBlocks()
 			vec3 newBlockLocation = vec3(i*blockSize, 0.0f, j*blockSize);
             //srand(citySeed * (i * blockSize * j));
             int randomFactor = rand() % 5;
-			totalBlocks.push_back(CityBlock(randomFactor, blockSize, 3, newBlockLocation, cityBlockTextures[randomFactor], citySeed));
+            if(i == 0 && j == 0)
+                totalBlocks.push_back(CityBlock(5, blockSize, 3, newBlockLocation, cityBlockTextures[5], citySeed));
+            else
+                totalBlocks.push_back(CityBlock(randomFactor, blockSize, 3, newBlockLocation, cityBlockTextures[randomFactor], citySeed));
 		}
 	}
 }

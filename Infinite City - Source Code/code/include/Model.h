@@ -13,9 +13,6 @@
 
 using namespace glm;
 
-extern GLuint cubeModelVAO;
-extern GLuint buildingTexture;
-
 void Initialize();
 
 void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLoction, GLuint textureLocation);
@@ -23,6 +20,10 @@ void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLoctio
 void DrawBuilding(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
 void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
+
+void DrawSpaceTower(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
+
+void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation);
 
 void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation);
 
