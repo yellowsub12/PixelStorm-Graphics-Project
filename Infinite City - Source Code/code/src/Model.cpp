@@ -15,6 +15,7 @@ GLuint leavesTexture = 0;
 GLuint soilTexture = 0;
 GLuint towerTexture = 0;
 GLuint benchTexture = 0;
+GLuint ironTexture = 0;
 
 
 void Initialize()
@@ -26,7 +27,7 @@ void Initialize()
 	leavesTexture = loadTexture((texturesPathPrefix + "leaves.png").c_str());
 	soilTexture = loadTexture((texturesPathPrefix + "soil.jpg").c_str());
 	benchTexture = loadTexture((texturesPathPrefix + "benchwood.png").c_str());
-
+	ironTexture = loadTexture((texturesPathPrefix + "iron.jpg").c_str());
 
 	towerTexture = loadTexture((texturesPathPrefix + "SpaceTower.jpg").c_str());
 }
@@ -39,7 +40,17 @@ void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocati
 	}
 	else if (blockType == 4)
 	{
-		DrawTree(position, tileSize, worldMatrixLocation, textureLocation);
+		int random_integer;
+		int lowest = 1, highest = 2;
+		int range = (highest - lowest) + 1;
+		random_integer = lowest + rand() % range;
+		if (random_integer == 1) {
+			DrawTree(position, tileSize, worldMatrixLocation, textureLocation);
+		}
+		if (random_integer == 2)
+		{
+			DrawBench(position, tileSize, worldMatrixLocation, textureLocation);
+		}
 	}
 	else 
 	{
@@ -54,7 +65,7 @@ void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocati
 	  {
 		DrawBuilding(position, tileSize, worldMatrixLocation, textureLocation);
 	  }
-	  else 
+	  if (random_integer == 3)
 	  {
 		  DrawBench(position, tileSize, worldMatrixLocation, textureLocation);
 	  }
@@ -152,27 +163,39 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 
 void DrawBench(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
 {
-	//int probabilityCheck = rand() % 100; // Variable to help us adjust what numbers spawn more often and what numbers spawn less often. 
-	//int randomFactor = 0; // The random factor which affects the scale of the building.// = rand() % 11; 
-	//if (probabilityCheck < 2) randomFactor = 9; // less than 2% of buildings will be 15 units tall
-	//if (probabilityCheck >= 2 && probabilityCheck < 30) randomFactor = rand() % 8; // around 28% of the city will be buildings that are between 3 to 5 units tall
-	//if (probabilityCheck >= 30 && probabilityCheck < 50) randomFactor = rand() % 7; // around 20% of the city will be buildings that are between 4 to 6 units tall
-	//if (probabilityCheck >= 50) randomFactor = rand() % 8; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
+	int probabilityCheck = rand() % 100; // Variable to help us adjust what numbers spawn more often and what numbers spawn less often. 
+	int randomBenchFactor = 9; // The random factor which affects the scale of the building.// = rand() % 11; 
+	if (probabilityCheck < 2) randomBenchFactor = 7; // less than 2% of buildings will be 15 units tall
+	if (probabilityCheck >= 2 && probabilityCheck < 30) randomBenchFactor = rand() % 9; // around 28% of the city will be buildings that are between 3 to 5 units tall
+	if (probabilityCheck >= 30 && probabilityCheck < 50) randomBenchFactor = rand() % 10; // around 20% of the city will be buildings that are between 4 to 6 units tall
+	if (probabilityCheck >= 50) randomBenchFactor = rand() % 8; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
 
-	//glBindVertexArray(cubeModelVAO);
+	glBindVertexArray(cubeModelVAO);
 
-	//// Assign texture to the building
-	//glBindTexture(GL_TEXTURE_2D, treeTexture);
-	//glUniform1i(textureLocation, 1);
+	// Assign texture to the building
+	glBindTexture(GL_TEXTURE_2D, benchTexture);
+	glUniform1i(textureLocation, 1);
 
-	//vec3 finalPosition = vec3(position.x, position.y + (0.1 * (3 + randomFactor)) / 2, position.z);
+	vec3 finalPosition = vec3(position.x, position.y + 0.075, position.z);
 
-	//mat4 tileWorldMatrix = translate(mat4(1.0f), finalPosition)
-	//	* scale(mat4(1.0f), vec3(tileSize * 0.05, (0.1 * (5 + randomFactor)), tileSize * 0.05)); //(0.5*(1+randomFactor))+scaleOffset
+	mat4 benchWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + 0.09), position.z))
+		* scale(mat4(1.0f), vec3(tileSize * 0.09 + (0.05 * (randomBenchFactor)), 0.025 + (0.0025 * (randomBenchFactor)), tileSize * 0.075 )); //(0.5*(1+randomFactor))+scaleOffset
 
-	//glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &tileWorldMatrix[0][0]);
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &benchWorldMatrix[0][0]);
 
-	//glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// Assign texture to the building
+	glBindTexture(GL_TEXTURE_2D, ironTexture);
+	glUniform1i(textureLocation, 1);
+
+
+	mat4 benchLegWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + 0.04 + (0.005 * (randomBenchFactor)/2)), position.z))
+		* scale(mat4(1.0f), vec3(tileSize * 0.06 + (0.05 * (randomBenchFactor)), 0.05 +(0.005 * (randomBenchFactor)), tileSize * 0.06)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &benchLegWorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
 
