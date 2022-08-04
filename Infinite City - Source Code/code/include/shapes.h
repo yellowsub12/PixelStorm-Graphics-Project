@@ -14,8 +14,6 @@ int createUnitPlane();
 
 int createUnitPyramid();
 
-int createTexturedCubeVertexArrayObject();
-
 #endif SHAPES_H
 
 

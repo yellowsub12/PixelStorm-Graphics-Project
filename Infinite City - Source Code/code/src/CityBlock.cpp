@@ -25,8 +25,6 @@ void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation
     // This is a work in progress method for drawing objects on each tile. (Sam and Ali can take a look at it)
     // As of now, this method renders only buildings on top of the blocks and nothing else. But this should and will be expanded later on. 
 
-    if (blockType == 4) return; // Do not draw anything if the block texture is the grass texture
-
     // Seed the generator again with a unique seed for each block, such that every block is unique in terms of what is on it. 
     srand(blockSeed + (blockLocation.x * blockLocation.z * 100)); 
 
