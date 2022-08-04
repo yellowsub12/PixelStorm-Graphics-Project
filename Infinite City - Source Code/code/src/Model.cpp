@@ -45,7 +45,7 @@ void DrawBuilding(vec3 position, float tileSize, GLuint worldMatrixLocation, GLu
 	if (probabilityCheck < 2) randomFactor = 15; // less than 2% of buildings will be 15 units tall
 	if (probabilityCheck >= 2 && probabilityCheck < 30) randomFactor = rand() % 5 + 3; // around 28% of the city will be buildings that are between 3 to 5 units tall
 	if (probabilityCheck >= 30 && probabilityCheck < 50) randomFactor = rand() % 6 + 4; // around 20% of the city will be buildings that are between 4 to 6 units tall
-	if (probabilityCheck >= 50) randomFactor = rand() % 4 + 2; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
+	if (probabilityCheck >= 50) randomFactor = rand() % 3 + 2; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
 
 	glBindVertexArray(cubeModelVAO);
 
@@ -67,10 +67,10 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 {
 	int probabilityCheck = rand() % 100; // Variable to help us adjust what numbers spawn more often and what numbers spawn less often. 
 	int randomFactor = 0; // The random factor which affects the scale of the building.// = rand() % 11; 
-	if (probabilityCheck < 2) randomFactor = 15; // less than 2% of buildings will be 15 units tall
-	if (probabilityCheck >= 2 && probabilityCheck < 30) randomFactor = rand() % 5 + 4; // around 28% of the city will be buildings that are between 3 to 5 units tall
-	if (probabilityCheck >= 30 && probabilityCheck < 50) randomFactor = rand() % 6 + 4; // around 20% of the city will be buildings that are between 4 to 6 units tall
-	if (probabilityCheck >= 50) randomFactor = rand() % 8; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
+	if (probabilityCheck < 2) randomFactor = 9; // less than 2% of buildings will be 15 units tall
+	if (probabilityCheck >= 2 && probabilityCheck < 30) randomFactor = rand() % 7; // around 28% of the city will be buildings that are between 3 to 5 units tall
+	if (probabilityCheck >= 30 && probabilityCheck < 50) randomFactor = rand() % 6 ; // around 20% of the city will be buildings that are between 4 to 6 units tall
+	if (probabilityCheck >= 50) randomFactor = rand() % 5; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
 
 	glBindVertexArray(MyTexturedCubeModelVAO);
 
@@ -81,7 +81,7 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 	vec3 finalPosition = vec3(position.x, position.y + (0.1 * (1 + randomFactor)) / 2, position.z);
 
 	mat4 tileWorldMatrix = translate(mat4(1.0f), finalPosition)
-		* scale(mat4(1.0f), vec3(tileSize*0.1, (0.1 * (3 + randomFactor)), tileSize*0.1)); //(0.5*(1+randomFactor))+scaleOffset
+		* scale(mat4(1.0f), vec3(tileSize*0.1, (0.1 * (5 + randomFactor)), tileSize*0.1)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &tileWorldMatrix[0][0]);
 
@@ -91,7 +91,7 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 
 
 	glBindTexture(GL_TEXTURE_2D, leavesTexture);
-	mat4 leavesWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (1 + randomFactor)) / 2 + (0.1 * (3 + randomFactor))/2), position.z))
+	mat4 leavesWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (3 + randomFactor))), position.z))
 		* scale(mat4(1.0f), vec3(tileSize * 0.2  + (0.025 * (1 + randomFactor)), tileSize * 0.2 + (0.025 * (1 + randomFactor)), tileSize * 0.2 + (0.025 * (1 + randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesWorldMatrix[0][0]);
