@@ -25,6 +25,9 @@ void DrawSpaceTower(vec3 position, float tileSize, GLuint worldMatrixLocation, G
 
 void DrawBench(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
+void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
+
+
 void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation);
 
 #endif MODEL_H

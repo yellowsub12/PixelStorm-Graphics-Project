@@ -16,6 +16,9 @@ GLuint soilTexture = 0;
 GLuint towerTexture = 0;
 GLuint benchTexture = 0;
 GLuint ironTexture = 0;
+GLuint fabricsTexture = 0;
+GLuint fabricsarmsTexture = 0;
+GLuint jeanslegTexture = 0;
 
 
 void Initialize()
@@ -28,7 +31,9 @@ void Initialize()
 	soilTexture = loadTexture((texturesPathPrefix + "soil.jpg").c_str());
 	benchTexture = loadTexture((texturesPathPrefix + "benchwood.png").c_str());
 	ironTexture = loadTexture((texturesPathPrefix + "iron.jpg").c_str());
-
+	fabricsTexture = loadTexture((texturesPathPrefix + "fabrics.png").c_str());
+	fabricsarmsTexture = loadTexture((texturesPathPrefix + "fabricsarms.png").c_str());
+	jeanslegTexture = loadTexture((texturesPathPrefix + "jeansleg.jpg").c_str());
 	towerTexture = loadTexture((texturesPathPrefix + "SpaceTower.jpg").c_str());
 }
 
@@ -200,24 +205,116 @@ void DrawBench(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 
 
 
-	//glBindTexture(GL_TEXTURE_2D, leavesTexture);
-	//mat4 leavesWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (5 + randomFactor))), position.z))
-	//	* scale(mat4(1.0f), vec3(tileSize * 0.2 + (0.05 * (randomFactor)), tileSize * 0.2 + (0.025 * (randomFactor)), tileSize * 0.2 + (0.05 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
+	
+}
 
-	//glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesWorldMatrix[0][0]);
+
+
+void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
+{
+	int probabilityCheck = rand() % 100; // Variable to help us adjust what numbers spawn more often and what numbers spawn less often. 
+	int randomBenchFactor = 9; // The random factor which affects the scale of the building.// = rand() % 11; 
+	int randomFactor = 0;
+	if (probabilityCheck < 2) randomBenchFactor = 7; // less than 2% of buildings will be 15 units tall
+	if (probabilityCheck >= 2 && probabilityCheck < 30) randomBenchFactor = rand() % 9; // around 28% of the city will be buildings that are between 3 to 5 units tall
+	if (probabilityCheck >= 30 && probabilityCheck < 50) randomBenchFactor = rand() % 10; // around 20% of the city will be buildings that are between 4 to 6 units tall
+	if (probabilityCheck >= 50) randomBenchFactor = rand() % 8; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
+
+	glBindVertexArray(cubeModelVAO);
+
+
+	// GLuint fabricsTexture
+	// GLuint fabricsarmsTexture 
+	// GLuint jeanslegTexture 
+
+	vec3 finalPosition = vec3(position.x, position.y + 0.075, position.z);
+
+	// Chest
+	glBindTexture(GL_TEXTURE_2D, fabricsTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 chestWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + 0.04 + (0.005 * (randomFactor) / 2)), position.z))
+		* scale(mat4(1.0f), vec3(tileSize * 0.06 + (0.05 * (randomBenchFactor)), 0.05 + (0.005 * (randomBenchFactor)), tileSize * 0.06)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &chestWorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+	// Arms 1 Left
+	glBindTexture(GL_TEXTURE_2D, fabricsarmsTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 armLeftWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + 0.04 + (0.005 * (randomBenchFactor) / 2)), position.z))
+		* scale(mat4(1.0f), vec3(tileSize * 0.06 + (0.05 * (randomBenchFactor)), 0.05 + (0.005 * (randomBenchFactor)), tileSize * 0.06)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &armLeftWorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// Arms 2 Right
+	glBindTexture(GL_TEXTURE_2D, fabricsarmsTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 armRightWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + 0.04 + (0.005 * (randomBenchFactor) / 2)), position.z))
+		* scale(mat4(1.0f), vec3(tileSize * 0.06 + (0.05 * (randomBenchFactor)), 0.05 + (0.005 * (randomBenchFactor)), tileSize * 0.06)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &armRightWorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// Legs 1 Left
+	glBindTexture(GL_TEXTURE_2D, jeanslegTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 legLeftWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + 0.04 + (0.005 * (randomBenchFactor) / 2)), position.z))
+		* scale(mat4(1.0f), vec3(tileSize * 0.06 + (0.05 * (randomBenchFactor)), 0.05 + (0.005 * (randomBenchFactor)), tileSize * 0.06)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &legLeftWorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// Legs 2 Right
+	glBindTexture(GL_TEXTURE_2D, jeanslegTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 legRightWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + 0.04 + (0.005 * (randomBenchFactor) / 2)), position.z))
+		* scale(mat4(1.0f), vec3(tileSize * 0.06 + (0.05 * (randomBenchFactor)), 0.05 + (0.005 * (randomBenchFactor)), tileSize * 0.06)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &legRightWorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+
+	/*vec3 finalPosition = vec3(position.x, position.y + 0.075, position.z);*/
+
+	//mat4 benchWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + 0.09), position.z))
+	//	* scale(mat4(1.0f), vec3(tileSize * 0.09 + (0.05 * (randomBenchFactor)), 0.025 + (0.0025 * (randomBenchFactor)), tileSize * 0.075)); //(0.5*(1+randomFactor))+scaleOffset
+
+	//glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &benchWorldMatrix[0][0]);
+
+	//glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	//// Assign texture to the building
+	//glBindTexture(GL_TEXTURE_2D, ironTexture);
+	//glUniform1i(textureLocation, 1);
+
+
+	//mat4 benchLegWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + 0.04 + (0.005 * (randomBenchFactor) / 2)), position.z))
+	//	* scale(mat4(1.0f), vec3(tileSize * 0.06 + (0.05 * (randomBenchFactor)), 0.05 + (0.005 * (randomBenchFactor)), tileSize * 0.06)); //(0.5*(1+randomFactor))+scaleOffset
+
+	//glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &benchLegWorldMatrix[0][0]);
 
 	//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
-	//glBindTexture(GL_TEXTURE_2D, soilTexture);
-	//mat4 soilWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y), position.z))
-	//	* scale(mat4(1.0f), vec3(tileSize * 0.1 + (0.05 * (randomFactor)), 0.025, tileSize * 0.1 + (0.05 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
 
-	//glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &soilWorldMatrix[0][0]);
 
-	//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 }
+
+
 
 void DrawSpaceTower(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
 {
