@@ -5,10 +5,6 @@
 #include <shapes.h>
 #include <Model.h>
 
-extern GLuint cubeModelVAO;
-extern GLuint buildingTexture;
-
-
 CityBlock::CityBlock(int type, int size, int numTilesRows, vec3 location, GLuint texture, int seed)
 {
 	blockSize = size;
@@ -21,6 +17,11 @@ CityBlock::CityBlock(int type, int size, int numTilesRows, vec3 location, GLuint
 
 void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation)
 {
+    if (blockType == 5) // Draw the Space Tower in the center of the world (0, 0, 0)
+    {
+        Draw(blockLocation, blockSize, blockType, worldMatrixLocation, textureLocation);
+        return; 
+    }
     // This is a work in progress method for drawing objects on each tile. (Sam and Ali can take a look at it)
     // As of now, this method renders only buildings on top of the blocks and nothing else. But this should and will be expanded later on. 
 

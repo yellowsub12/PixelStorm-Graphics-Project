@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
     long infiniteCitySeed = static_cast<long>(time(NULL)); // The overall starting seed of the city - This seed will entirely define the uniqueness of the looks of the city.
     int cityStartingLength = 5; // How many blocks long is the city at the start of the program (before the city grows as we move around)?
     int cityStartingWidth = 5;  // How many blocks wide is the city at the start of the program (before the city grows as we move around)?
-    int blockSize = 5; // Size of each block in the city, a block will contain elements on it such as buildings, parks, trees, etc. A building block of the city. 
+    int blockSize = 10; // Size of each block in the city, a block will contain elements on it such as buildings, parks, trees, etc. A building block of the city. 
 
 
     srand(infiniteCitySeed); // Seeding the random number generator with our city seed so every rand() call will generate the same random numbers in the same sequence. 
