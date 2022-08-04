@@ -22,7 +22,7 @@ void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLoctio
 
 void DrawBuilding(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
-void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation);
+void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
 void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation);
 
