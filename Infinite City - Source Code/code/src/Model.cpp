@@ -92,7 +92,7 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 
 	glBindTexture(GL_TEXTURE_2D, leavesTexture);
 	mat4 leavesWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (3 + randomFactor))), position.z))
-		* scale(mat4(1.0f), vec3(tileSize * 0.2  + (0.025 * (1 + randomFactor)), tileSize * 0.2 + (0.025 * (1 + randomFactor)), tileSize * 0.2 + (0.025 * (1 + randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
+		* scale(mat4(1.0f), vec3(tileSize * 0.2  + (0.05 * (1 + randomFactor)), tileSize * 0.2 + (0.05 * (1 + randomFactor)), tileSize * 0.2 + (0.05 * (1 + randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesWorldMatrix[0][0]);
 
