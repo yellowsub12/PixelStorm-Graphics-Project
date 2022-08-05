@@ -220,6 +220,11 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 
 	glBindVertexArray(cubeModelVAO);
 
+	mat4 initialPosition = mat4(1.0);
+	mat4 initialScale = mat4(1.0);
+	mat4 initialRotation = mat4(1.0);
+
+
 
 	// GLuint fabricsTexture
 	// GLuint fabricsarmsTexture 
@@ -231,10 +236,12 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 	glBindTexture(GL_TEXTURE_2D, fabricsTexture);
 	glUniform1i(textureLocation, 1);
 
-	mat4 chestWorldMatrix = translate(mat4(1.0f), vec3(position.x, position.y + 1.0, position.z))
-		* scale(mat4(1.0f), vec3(0.35, 0.5, 0.15)); //(0.5*(1+randomFactor))+scaleOffset
 
-	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &chestWorldMatrix[0][0]);
+
+	mat4 BodyMatrix = initialPosition * translate(mat4(1.0f), vec3(position.x, position.y + 1.0, position.z)) * initialRotation
+		* scale(mat4(1.0f), vec3(0.35, 0.5, 0.15)) * initialScale; //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &BodyMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -243,8 +250,8 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 	glBindTexture(GL_TEXTURE_2D, fabricsarmsTexture);
 	glUniform1i(textureLocation, 1);
 
-	mat4 armLeftWorldMatrix = translate(mat4(1.0f), vec3(position.x + 0.228, position.y + 0.98, position.z))
-		* scale(mat4(1.0f), vec3(0.1, 0.52, 0.15)); //(0.5*(1+randomFactor))+scaleOffset
+	mat4 armLeftWorldMatrix = BodyMatrix * translate(mat4(1.0f), vec3(0.65, -0.03, 0))
+		* scale(mat4(1.0f), vec3(0.29, 1.03, 1.0)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &armLeftWorldMatrix[0][0]);
 
@@ -254,8 +261,8 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 	glBindTexture(GL_TEXTURE_2D, fabricsarmsTexture);
 	glUniform1i(textureLocation, 1);
 
-	mat4 armRightWorldMatrix = translate(mat4(1.0f), vec3(position.x - 0.228, position.y + 0.98, position.z))
-		* scale(mat4(1.0f), vec3(0.1, 0.52, 0.15)); //(0.5*(1+randomFactor))+scaleOffset
+	mat4 armRightWorldMatrix = BodyMatrix * translate(mat4(1.0f), vec3(-0.65, -0.03, 0))
+		* scale(mat4(1.0f), vec3(0.29, 1.03, 1.0)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &armRightWorldMatrix[0][0]);
 
@@ -265,8 +272,8 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 	glBindTexture(GL_TEXTURE_2D, jeanslegTexture);
 	glUniform1i(textureLocation, 1);
 
-	mat4 legLeftWorldMatrix = translate(mat4(1.0f), vec3(position.x + 0.09, position.y + 0.49, position.z)) *  rotate(mat4(1.0f), 3.14159f, vec3(1.0f, 0.0f, 0.0f))
-		* scale(mat4(1.0f), vec3(0.15, 0.52, 0.15)); //(0.5*(1+randomFactor))+scaleOffset
+	mat4 legLeftWorldMatrix = BodyMatrix * translate(mat4(1.0f), vec3(0.26, -1.02, 0)) *  rotate(mat4(1.0f), 3.14159f, vec3(1.0f, 0.0f, 0.0f))
+		* scale(mat4(1.0f), vec3(0.43, 1.03, 1.0)); //(0.5*(1+randomFactor))+scaleOffset
 
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &legLeftWorldMatrix[0][0]);
@@ -277,8 +284,8 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 	glBindTexture(GL_TEXTURE_2D, jeanslegTexture);
 	glUniform1i(textureLocation, 1);
 
-	mat4 legRightWorldMatrix = translate(mat4(1.0f), vec3(position.x - 0.09, position.y + 0.49, position.z)) * rotate(mat4(1.0f), 3.14159f, vec3(1.0f, 0.0f, 0.0f))
-		* scale(mat4(1.0f), vec3(0.15, 0.52, 0.15)); //(0.5*(1+randomFactor))+scaleOffset
+	mat4 legRightWorldMatrix = BodyMatrix * translate(mat4(1.0f), vec3(-0.26, -1.02, 0)) * rotate(mat4(1.0f), 3.14159f, vec3(1.0f, 0.0f, 0.0f))
+		* scale(mat4(1.0f), vec3(0.43, 1.03, 1.0)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &legRightWorldMatrix[0][0]);
 
@@ -289,8 +296,8 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 	glBindTexture(GL_TEXTURE_2D, frontTexture);
 	glUniform1i(textureLocation, 1);
 
-	mat4 headWorldMatrix = translate(mat4(1.0f), vec3(position.x, position.y + 1.4, position.z))
-		* scale(mat4(1.0f), vec3(0.3, 0.3, 0.3)); //(0.5*(1+randomFactor))+scaleOffset
+	mat4 headWorldMatrix = BodyMatrix *  translate(mat4(1.0f), vec3(0, 0.75, -0.05))
+		* scale(mat4(1.0f), vec3(0.8, 0.5, 1.6)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &headWorldMatrix[0][0]);
 
