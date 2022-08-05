@@ -30,7 +30,7 @@ void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation
 
     float tileSize = blockSize/4; // horizontal size of each building
     
-    // Nested for loop to generate the buildings on the block  in the format of a 3x3 board.
+    // Nested for loop to generate the buildings on the block in the format of a 3x3 board.
     // This for loop works by considering each block as a 2d square grid in the format of 3x3, 4x4, etc. 
     for (int i = 0; i < numOfTileRows; i++)
     {

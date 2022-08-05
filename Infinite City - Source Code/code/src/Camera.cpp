@@ -6,7 +6,7 @@
 
 
 Camera::Camera(float camSpeed) {
-	position = vec3(10.0f, 10.0f, 10.0f);
+	position = vec3(0.0f, 0.0f, 0.0f);
 	lookAt = vec3(0.0f);
 	fov = 70.0f;
     cameraAngularSpeed = 10.0f;
