@@ -32,7 +32,7 @@ public:
 	Camera mainCamera; // The main "player" camera through which we see the Infinite City
 	GLuint cityBlockTextures[6]; // Array of textures for the block planes of the city
 
-	InfiniteCity(int width, int length, int sizeBlock, Camera newCam, int seed);
+	InfiniteCity(int width, int length, int sizeBlock, int seed);
 
 	// Method to spawn the starting series of blocks in the city when the program starts
 	void SpawnStartingBlocks(); 
