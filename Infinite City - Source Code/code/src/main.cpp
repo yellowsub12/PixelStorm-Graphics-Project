@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     Camera mainCamera; // The main camera that will 
     int cityStartingLength = 5; // How many blocks long is the city at the start of the program (before the city grows as we move around)?
     int cityStartingWidth = 5;  // How many blocks wide is the city at the start of the program (before the city grows as we move around)?
-    int blockSize = 100; // Size of each block in the city, a block will contain elements on it such as buildings, parks, trees, etc. A building block of the city. 
+    int blockSize = 50; // Size of each block in the city, a block will contain elements on it such as buildings, parks, trees, etc. A building block of the city. 
 
     cout << "Current Seed: " << constant::PROCEDURAL_SEED << endl; // Prints the seed to the console for later reference 
 

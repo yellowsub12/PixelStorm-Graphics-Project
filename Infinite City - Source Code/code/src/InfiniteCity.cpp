@@ -15,13 +15,26 @@ InfiniteCity::InfiniteCity(int width, int length, int sizeBlock, Camera newCam, 
 	cityLength = length;
 	cityWidth = width;
 	blockSize = sizeBlock;
-	zSpawnFrontLocation = length / 2.0f;
-	xSpawnFrontLocation = width / 2.0f;
-    zSpawnBackLocation = - length / 2.0f;
-    xSpawnBackLocation = - width / 2.0f;
-    GenerateTextureArray();
+	zSpawnFrontLocation = blockSize * length/3;
+	xSpawnFrontLocation = blockSize * width/3;
+  zSpawnBackLocation = blockSize * -length/3;
+  xSpawnBackLocation = blockSize * -width/3;
+  GenerateTextureArray();
 	SpawnStartingBlocks();
     citySeed = seed;
+
+    InfinitePathRowFStartNumber = 0;
+    InfinitePathRowFEndNumber = 0;
+
+    InfinitePathRowBStartNumber = 0;
+    InfinitePathRowBEndNumber = 0;
+
+    InfinitePathColumnFStartNumber = 0;
+    InfinitePathColumnFEndNumber = 0;
+
+    InfinitePathColumnBStartNumber = 0;
+    InfinitePathColumnBEndNumber = 0;
+
 }
 
 void InfiniteCity::GenerateTextureArray()
@@ -34,6 +47,7 @@ void InfiniteCity::GenerateTextureArray()
     GLuint cityBlock4TextureID = loadTexture((texturesPathPrefix + "cityblock4.png").c_str());
     GLuint grassTextureID = loadTexture((texturesPathPrefix + "ground.png").c_str());
     GLuint sTowerBaseTextureID = loadTexture((texturesPathPrefix + "SpaceTowerBase.jpg").c_str());
+    testTexture = loadTexture((texturesPathPrefix + "test.jpg").c_str());
 
     cityBlockTextures[0] = cityBlock1TextureID;
     cityBlockTextures[1] = cityBlock2TextureID;
@@ -57,40 +71,114 @@ void InfiniteCity::SpawnStartingBlocks()
     else           
         columns = cityLength / 2 + 1;
 
+    InfinitePathRowFStartNumber = 0;
+    InfinitePathRowFEndNumber = InfinitePathRowFStartNumber;
+
+    InfinitePathRowBStartNumber = 0;
+    InfinitePathRowBEndNumber = InfinitePathRowBStartNumber;
+
+    InfinitePathColumnFStartNumber = 0;
+    InfinitePathColumnFEndNumber = InfinitePathColumnFStartNumber;
+
+    InfinitePathColumnBStartNumber = 0;
+    InfinitePathColumnBEndNumber = InfinitePathColumnBStartNumber;
+
 
 	for (int i = -cityWidth/2; i < rows; i++)
 	{
 		for (int j = -cityLength/2; j < columns; j++)
 		{
+            
 			vec3 newBlockLocation = vec3(i*blockSize, 0.0f, j*blockSize);
             //srand(citySeed * (i * blockSize * j));
             int randomFactor = rand() % 5;
             if(i == 0 && j == 0)
                 totalBlocks.push_back(CityBlock(5, blockSize, 3, newBlockLocation, cityBlockTextures[5], citySeed));
             else
-                totalBlocks.push_back(CityBlock(randomFactor, blockSize, 3, newBlockLocation, cityBlockTextures[randomFactor], citySeed));
+            {
+                if(j < 0 && i == InfinitePathRowFStartNumber)
+                    totalBlocks.push_back(CityBlock(2, blockSize, 3, newBlockLocation, cityBlockTextures[2], citySeed));
+                else if (j > 0 && i == InfinitePathRowBStartNumber)
+                    totalBlocks.push_back(CityBlock(2, blockSize, 3, newBlockLocation, cityBlockTextures[2], citySeed));
+                else if (i < 0 && j == InfinitePathColumnFStartNumber)                            
+                    totalBlocks.push_back(CityBlock(2, blockSize, 3, newBlockLocation, cityBlockTextures[2], citySeed));
+                else if (i > 0 && j == InfinitePathColumnBStartNumber)                            
+                    totalBlocks.push_back(CityBlock(2, blockSize, 3, newBlockLocation, cityBlockTextures[2], citySeed));
+                else
+                    totalBlocks.push_back(CityBlock(randomFactor, blockSize, 3, newBlockLocation, cityBlockTextures[randomFactor], citySeed));
+            }
+                
 		}
 	}
 }
 
 void InfiniteCity::SpawnRowBlocks(int rowNumber, int direction, int frontColumns, int backColumns)
 {
+    if (direction == 1)
+    {
+        InfinitePathRowFEndNumber = InfinitePathRowFStartNumber + (rand() % (frontColumns + 1));
+        InfinitePathRowFStartNumber = (-backColumns) + (rand() % (InfinitePathColumnFStartNumber + 1));
+    }
+    else
+    {
+        InfinitePathRowBEndNumber = InfinitePathRowBStartNumber + (rand() % (frontColumns + 1));
+        InfinitePathRowBStartNumber = (-backColumns) + (rand() % (InfinitePathColumnBStartNumber + 1));
+    }
+
     for (int i = -backColumns; i < (frontColumns+1); i++)
     {
        vec3 newBlockLocation = vec3(direction*rowNumber*blockSize, 0.0f, i * blockSize);
        //srand(citySeed + (rowNumber * blockSize * i * direction));
        int randomFactor = rand() % 5;
-       totalBlocks.push_back(CityBlock(randomFactor, blockSize, 3, newBlockLocation, cityBlockTextures[randomFactor], citySeed));
+       if (direction == 1)
+       {
+           if (i >= InfinitePathRowFStartNumber && i <= InfinitePathRowFEndNumber)
+               totalBlocks.push_back(CityBlock(2, blockSize, 3 , newBlockLocation, cityBlockTextures[2], citySeed));
+           else
+               totalBlocks.push_back(CityBlock(randomFactor, blockSize, 3, newBlockLocation, cityBlockTextures[randomFactor], citySeed));
+       }
+       else
+       {
+           if (i >= InfinitePathRowBStartNumber && i <= InfinitePathRowBEndNumber)
+               totalBlocks.push_back(CityBlock(2, blockSize, 3, newBlockLocation, cityBlockTextures[2], citySeed));
+           else
+               totalBlocks.push_back(CityBlock(randomFactor, blockSize, 3, newBlockLocation, cityBlockTextures[randomFactor], citySeed));
+       } 
     }
 }
 
 void InfiniteCity::SpawnColumnBlocks(int columnNumber, int direction, int frontRows, int backRows)
 {
-    for (int i = -backRows; i < (frontRows+1); i++) {
+    if (direction == 1)
+    {
+        InfinitePathColumnFEndNumber = InfinitePathColumnFStartNumber + (rand() % (frontRows + 1));
+        InfinitePathColumnFStartNumber = (-backRows) + (rand() % (InfinitePathRowFStartNumber + 1));
+    }
+    else
+    {
+        InfinitePathColumnBEndNumber = InfinitePathColumnBStartNumber + (rand() % (frontRows + 1));
+        InfinitePathColumnBStartNumber = (-backRows) + (rand() % (InfinitePathRowBStartNumber + 1));
+    }
+
+    for (int i = -backRows; i < (frontRows+1); i++)
+    {
         vec3 newBlockLocation = vec3(i * blockSize, 0.0f, direction * columnNumber * blockSize);
         //srand(citySeed + (columnNumber*blockSize*i*direction));
         int randomFactor = rand() % 5;
-        totalBlocks.push_back(CityBlock(randomFactor, blockSize, 3, newBlockLocation, cityBlockTextures[randomFactor], citySeed));
+        if (direction == 1)
+        {
+            if (i >= InfinitePathColumnFStartNumber && i <= InfinitePathColumnFEndNumber)
+                totalBlocks.push_back(CityBlock(2, blockSize, 3, newBlockLocation, cityBlockTextures[2], citySeed));
+            else
+                totalBlocks.push_back(CityBlock(randomFactor, blockSize, 3, newBlockLocation, cityBlockTextures[randomFactor], citySeed));
+        }
+        else
+        {
+            if (i >= InfinitePathColumnBStartNumber && i <= InfinitePathColumnBEndNumber)
+                totalBlocks.push_back(CityBlock(2, blockSize, 3, newBlockLocation, cityBlockTextures[2], citySeed));
+            else
+                totalBlocks.push_back(CityBlock(randomFactor, blockSize, 3, newBlockLocation, cityBlockTextures[randomFactor], citySeed));
+        }
     }
 }
 
@@ -361,7 +449,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
             // Render the the block only if its is within view (dotproduct) or if it is within 50.0f units from the camera
             // However, if the block is within 10.0f units from the camera, it will render no matter what. 
-            if ((abs(dotproduct) > 0.75 &&  distanceFromCamera < 50.0f) || distanceFromCamera < 10.0f)
+            if ((abs(dotproduct) > 0.75 &&  distanceFromCamera < 100.0f) || distanceFromCamera < 10.0f)
             {
                 glBindVertexArray(planeVAO);
                 block.DrawBlock(sceneShaderProgram, worldMatrixLocation1, actualTextureLocation);
