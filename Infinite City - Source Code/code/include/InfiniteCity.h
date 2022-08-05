@@ -31,6 +31,20 @@ public:
 	GLuint planeVAO; // Plane VAO that will help us draw the block plane
 	Camera mainCamera; // The main "player" camera through which we see the Infinite City
 	GLuint cityBlockTextures[6]; // Array of textures for the block planes of the city
+	GLuint testTexture;
+
+	int InfinitePathRowFStartNumber;
+	int InfinitePathRowFEndNumber;
+
+	int InfinitePathRowBStartNumber;
+	int InfinitePathRowBEndNumber;
+
+	int InfinitePathColumnFStartNumber;
+	int InfinitePathColumnFEndNumber;
+
+	int InfinitePathColumnBStartNumber;
+	int InfinitePathColumnBEndNumber;
+
 
 	InfiniteCity(int width, int length, int sizeBlock, int seed);
 
