@@ -28,13 +28,13 @@ void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation
     // Seed the generator again with a unique seed for each block, such that every block is unique in terms of what is on it. 
     srand(blockSeed + (blockLocation.x * blockLocation.z * 100)); 
 
-    float tileSize = blockSize/4; // horizontal size of each building
+    float tileSize = blockSize/3; // horizontal size of each building
     
     // Nested for loop to generate the buildings on the block in the format of a 3x3 board.
     // This for loop works by considering each block as a 2d square grid in the format of 3x3, 4x4, etc. 
-    for (int i = 0; i < numOfTileRows; i++)
+    for (int i = -numOfTileRows/2; i <= numOfTileRows/2; i++)
     {
-        for (int j = 0; j < numOfTileRows; j++)
+        for (int j = -numOfTileRows/2; j <= numOfTileRows/2; j++)
         {
             //if (rand() % 11 > 5) continue;
            
@@ -42,23 +42,27 @@ void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation
             // Buildings will only be placed on the part of the block that has no road and only has empty dark gray space. 
             if (blockType == 0)
             {
-                if (i == 1) continue;
+                if (i == 0) continue;
             }
             else if (blockType == 1)
             {
-                if (j == 1)
+                if (j == 0)
+                {
                     if (i == 0 || i == 1)
+                    {
                         continue;
-                if (i == 1 && j == 0) continue;
+                    }
+                }
+                if (i == 0 && j == 1) continue;
             }
             else if (blockType == 2)
             {
-                if (i == 1 || j == 1) continue;          
+                if (i == 0 || j == 0) continue;          
             }
             else if (blockType == 3)
             {
-                if (j == 1) continue;
-                if (i == 1 && j == 0) continue;
+                if (j == 0) continue;
+                if (j == 1 && i == 0) continue;
             }
 
             // Adjusting the probability of getting certain numbers from the random generator
@@ -73,15 +77,15 @@ void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation
             // number generator. 
 
             // Calculating position of new object on the blocks (building, tree, whatever)
-            vec3 position = vec3(blockLocation.x + (1 - i) * (blockSize / 2.5), 
+            vec3 position = vec3(blockLocation.x + (i*(blockSize/3)+(i * (1.0f/numOfTileRows))), 
                blockLocation.y,
-               blockLocation.z + (1 - j) * (blockSize / 2.5));
+               blockLocation.z + (j * (blockSize/3) + (j*(1.0f/numOfTileRows))));
 
-            Draw(position, tileSize, blockType, worldMatrixLocation, textureLocation);
+            Draw(position, tileSize+(1.0f/numOfTileRows), blockType, worldMatrixLocation, textureLocation);
 
-            /*// Assigning the world matrix for this tile using the calculated location above. 
-            mat4 tileWorldMatrix = translate(mat4(1.0f), position)
-                * scale(mat4(1.0f), vec3(tileSize, (0.5 * (1 + randomFactor)), tileSize)); //(0.5*(1+randomFactor))+scaleOffset
+            //Assigning the world matrix for this tile using the calculated location above. 
+            /*mat4 tileWorldMatrix = translate(mat4(1.0f), position)
+                * scale(mat4(1.0f), vec3(tileSize+(1.0f/numOfTileRows), 0.5, tileSize+(1.0f/numOfTileRows))); //(0.5*(1+randomFactor))+scaleOffset
 
             glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &tileWorldMatrix[0][0]);
 

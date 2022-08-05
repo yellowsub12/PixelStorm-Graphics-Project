@@ -454,7 +454,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
             // Render the the block only if its is within view (dotproduct) or if it is within 50.0f units from the camera
             // However, if the block is within 10.0f units from the camera, it will render no matter what. 
-            if ((abs(dotproduct) > 0.75 &&  distanceFromCamera < 50.0f) || distanceFromCamera < 10.0f)
+            if ((abs(dotproduct) > 0.75 &&  distanceFromCamera < 100.0f) || distanceFromCamera < 10.0f)
             {
                 glBindVertexArray(planeVAO);
                 block.DrawBlock(sceneShaderProgram, worldMatrixLocation1, actualTextureLocation);
