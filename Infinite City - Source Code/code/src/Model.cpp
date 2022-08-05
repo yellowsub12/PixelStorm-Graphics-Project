@@ -59,18 +59,17 @@ void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocati
 	}
 	else 
 	{
-    /*int random_integer;
-	  int lowest = 1, highest = 2;
-	  int range = (highest - lowest) + 1;
-	  random_integer = lowest + rand() % range;
-	  if (random_integer == 1) {
-	  	DrawTree(position, tileSize, worldMatrixLocation, textureLocation);
-	  }
-	  if (random_integer == 2)
-	  {
-		DrawBuilding(position, tileSize, worldMatrixLocation, textureLocation);
-	  }*/
-		DrawBuilding(position, tileSize, worldMatrixLocation, textureLocation);
+		int random_integer;
+		int lowest = 1, highest = 2;
+		int range = (highest - lowest) + 1;
+		random_integer = lowest + rand() % range;
+		if (random_integer == 1) {
+			DrawTree(position, tileSize, worldMatrixLocation, textureLocation);
+		}
+		if (random_integer == 2)
+		{
+			DrawBuilding(position, tileSize, worldMatrixLocation, textureLocation);
+		}
 	}
 }
 
@@ -117,17 +116,15 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 	vec3 finalPosition = vec3(position.x, position.y + (0.1 * (3 + randomFactor)) / 2, position.z);
 
 	mat4 tileWorldMatrix = translate(mat4(1.0f), finalPosition)
-		* scale(mat4(1.0f), vec3(tileSize * 0.05, (0.1 * (5 + randomFactor)), tileSize * 0.05)); //(0.5*(1+randomFactor))+scaleOffset
+		* scale(mat4(1.0f), vec3(tileSize * 0.05, (0.1 * (5 + randomFactor))*tileSize, tileSize * 0.05)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &tileWorldMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
-
-
-
 	glBindTexture(GL_TEXTURE_2D, leavesTexture);
-	mat4 leavesWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (5 + randomFactor))), position.z))
+	mat4 leavesWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (5 + randomFactor))*tileSize/2), position.z))
+		* rotate(mat4(1.0f), 0.05f*sinf(2*glfwGetTime()), vec3(0.0f, 1.0f, 0.0f))
 		* scale(mat4(1.0f), vec3(tileSize * 0.2 + (0.05 * ( randomFactor)), tileSize * 0.2 + (0.025 * ( randomFactor)), tileSize * 0.2 + (0.05 * ( randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesWorldMatrix[0][0]);
@@ -136,7 +133,8 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 
 	// Upper part
 	glBindTexture(GL_TEXTURE_2D, leavesTexture);
-	mat4 leavesUpperWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (7 + randomFactor))), position.z))
+	mat4 leavesUpperWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (7 + randomFactor)) * tileSize / 2), position.z))
+		* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f/2)), vec3(0.0f, 1.0f, 0.0f))
 		* scale(mat4(1.0f), vec3(tileSize * 0.15 + (0.05 * (randomFactor)), tileSize * 0.15 + (0.025 * (randomFactor)), tileSize * 0.15 + (0.05 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesUpperWorldMatrix[0][0]);
@@ -145,7 +143,8 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 
 	// Upper upper part
 	glBindTexture(GL_TEXTURE_2D, leavesTexture);
-	mat4 leavesUpperUpperWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (9 + randomFactor))), position.z))
+	mat4 leavesUpperUpperWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (9 + randomFactor)) * tileSize / 2), position.z))
+		* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f/3)), vec3(0.0f, 1.0f, 0.0f))
 		* scale(mat4(1.0f), vec3(tileSize * 0.075 + (0.05 * (randomFactor)), tileSize * 0.075 + (0.025 * (randomFactor)), tileSize * 0.075 + (0.05 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesUpperUpperWorldMatrix[0][0]);
@@ -154,7 +153,7 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 
 	glBindTexture(GL_TEXTURE_2D, soilTexture);
 	mat4 soilWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y), position.z))
-		* scale(mat4(1.0f), vec3(tileSize * 0.1 + (0.05 * (randomFactor)), 0.025 , tileSize * 0.1 + (0.05 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
+		* scale(mat4(1.0f), vec3(tileSize, 0.025 , tileSize)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &soilWorldMatrix[0][0]);
 
@@ -180,8 +179,8 @@ void DrawBench(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 
 	vec3 finalPosition = vec3(position.x, position.y + 0.075, position.z);
 
-	mat4 benchWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + 0.09), position.z))
-		* scale(mat4(1.0f), vec3(tileSize * 0.09 + (0.05 * (randomBenchFactor)), 0.025 + (0.0025 * (randomBenchFactor)), tileSize * 0.075 )); //(0.5*(1+randomFactor))+scaleOffset
+	mat4 benchWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + 0.5), position.z))
+		* scale(mat4(1.0f), vec3(tileSize * 0.09 + (0.05 * (randomBenchFactor)), 0.025 + (0.0025 * (randomBenchFactor * tileSize)), tileSize * 0.075 )); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &benchWorldMatrix[0][0]);
 
@@ -191,9 +190,8 @@ void DrawBench(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 	glBindTexture(GL_TEXTURE_2D, ironTexture);
 	glUniform1i(textureLocation, 1);
 
-
 	mat4 benchLegWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + 0.04 + (0.005 * (randomBenchFactor)/2)), position.z))
-		* scale(mat4(1.0f), vec3(tileSize * 0.06 + (0.05 * (randomBenchFactor)), 0.05 +(0.005 * (randomBenchFactor)), tileSize * 0.06)); //(0.5*(1+randomFactor))+scaleOffset
+		* scale(mat4(1.0f), vec3(tileSize * 0.06 + (0.05 * (randomBenchFactor)), (0.05 +(0.005 * (randomBenchFactor * tileSize))), tileSize * 0.06)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &benchLegWorldMatrix[0][0]);
 

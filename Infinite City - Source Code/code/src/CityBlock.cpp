@@ -77,11 +77,11 @@ void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation
             // number generator. 
 
             // Calculating position of new object on the blocks (building, tree, whatever)
-            vec3 position = vec3(blockLocation.x + (i*(blockSize/3)+(i * (1.0f/numOfTileRows))), 
+            vec3 position = vec3(blockLocation.x + i*(blockSize/3), 
                blockLocation.y,
-               blockLocation.z + (j * (blockSize/3) + (j*(1.0f/numOfTileRows))));
+               blockLocation.z + j * (blockSize/3));
 
-            Draw(position, tileSize+(1.0f/numOfTileRows), blockType, worldMatrixLocation, textureLocation);
+            Draw(position, tileSize+1, blockType, worldMatrixLocation, textureLocation);
 
             //Assigning the world matrix for this tile using the calculated location above. 
             /*mat4 tileWorldMatrix = translate(mat4(1.0f), position)
