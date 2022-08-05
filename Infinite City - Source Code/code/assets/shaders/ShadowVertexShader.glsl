@@ -11,6 +11,6 @@ void main()
                                     vec4(0.0, 0.0, 0.5, 0.0),
                                     vec4(0.5, 0.5, 0.5, 1.0));
     gl_Position = 
-//					scaleBiasMatrix * // bias the depth map coordinates
+					scaleBiasMatrix * // bias the depth map coordinates
                     lightViewProjMatrix * worldMatrix * vec4(position, 1.0);
 }

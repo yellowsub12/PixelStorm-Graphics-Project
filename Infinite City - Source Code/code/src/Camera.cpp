@@ -23,9 +23,9 @@ void Camera::updateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, 
     
     // set view and projection matrices
     mat4 viewMatrix = glm::lookAt(position, position + lookAt, cameraUp);
-    mat4 projectionMatrix = perspective(fov,
-                                        dWidth * 1.0f / dHeight,
-                                        0.1f, 200.0f); //near, far plane
+    mat4 projectionMatrix = glm::perspective(fov,
+        constant::SCREEN_WIDTH * 1.0f / constant::SCREEN_HEIGHT,
+        0.1f, 10000.0f);
 
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
     glUniformMatrix4fv(projMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);

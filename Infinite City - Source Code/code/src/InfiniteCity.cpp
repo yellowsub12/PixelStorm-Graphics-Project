@@ -7,7 +7,9 @@
 #include <Shader.h>
 #include <random>
 #include "Model.h"
+#include <constants.hpp>
 #include "Controls.h"
+
 
 using namespace std;
 
@@ -185,6 +187,7 @@ void InfiniteCity::SpawnColumnBlocks(int columnNumber, int direction, int frontR
 
 void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuint shadowShaderProgram)
 {
+    const float PI = 3.1415926535f;
     Initialize();
     planeVAO = createUnitPlane();
     int skyboxVAO = createUnitCubeReversed();
@@ -289,13 +292,13 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
         currentCityTime = dayNightCycleTime * sinf(currentTime*0.1f); // Update the time in the city
 
-        /*int WIDTH, HEIGHT;
+        int WIDTH, HEIGHT;
         glfwGetFramebufferSize(window, &WIDTH, &HEIGHT);
         glViewport(0, 0, WIDTH, HEIGHT);
 
         glBindTexture(GL_TEXTURE_2D, depth_map_texture);
         // Create the texture - We want to make sure the dimensions of the texture match the dimension of the window to prevent any weirdness with the shadows. 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, WIDTH, HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT,
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, constant::SCREEN_WIDTH, constant::SCREEN_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT,
             NULL);
         // Set texture sampler parameters.
         // Choose closest pixel to the provided texture coordinate
@@ -312,12 +315,15 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
 
         // light parameters
-        vec3 lightPosition = vec3(1000.0f, 1000.0f, -1000.0f); // the location of the light in 3D space, variable
-        vec3 lightFocus = vec3(-1000.0f, -1000.0f, 1000.0f);      // the point in 3D space the light "looks" at
+        vec3 lightPosition = vec3(-100.0f * (dayNightCycleTime * sinf((currentTime * 0.1) + PI / 2)),
+            100.0f*(dayNightCycleTime * sinf(currentTime * 0.1)), 
+            0.0f); // the location of the light in 3D space, variable
+        //vec3 lightPosition = vec3(20.0f, 20.0f, 20.0f);
+        vec3 lightFocus = vec3(0.0f, 0.0f, 1.0f);      // the point in 3D space the light "looks" at
         vec3 lightDirection = normalize(lightFocus - lightPosition);
 
         float lightNearPlane = 1.0f;
-        float lightFarPlane = 200000.0f;
+        float lightFarPlane = 8000.0f;
 
         //Setting up the light projection matrix
         mat4 lightProjectionMatrix = frustum(-1.0f, 1.0f, -1.0f, 1.0f, lightNearPlane, lightFarPlane);
@@ -369,7 +375,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
         glBindFramebuffer(GL_FRAMEBUFFER, depth_map_fbo);
 
-        glClear(GL_DEPTH_BUFFER_BIT);*/
+        glClear(GL_DEPTH_BUFFER_BIT);
 
         
         // The following if-statements handle the spawning of more blocks when the camera moves towards the edges of the city
@@ -401,11 +407,20 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
         }
 
-        //for (auto block: totalBlocks)
-        //{
-          //  block.DrawBlock(shadowShaderProgram, worldMatrixLocation2);
-           // //std::cout << totalBlocks.size() << std::endl;
-       // }
+        for (auto block: totalBlocks)
+        {
+            // Variables to calculate distance and dot product between the camera and the individual blocks
+            vec3 cameraToBlock = block.blockLocation - mainCamera.position;
+            float distanceFromCamera = length(vec3(cameraToBlock.x, 0.0f, cameraToBlock.z));
+
+            // Render the the block only if its is within view (dotproduct) or if it is within 50.0f units from the camera
+            // However, if the block is within 10.0f units from the camera, it will render no matter what. 
+            if (distanceFromCamera < 500.0f)
+            {
+                glBindVertexArray(planeVAO);
+                block.DrawBlock(shadowShaderProgram, worldMatrixLocation2, actualTextureLocation);
+            }
+        }
 
 
         // |---------------------------------------------------------------------------------------------------------------------------|
@@ -414,15 +429,16 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         // |---------------------------------------------------------------------------------------------------------------------------|
 
 
-        glUseProgram(sceneShaderProgram);
-        //int width, height;
-        //glfwGetFramebufferSize(window, &width, &height);
-        //glViewport(0, 0, width, height);
-        //// Bind screen as output framebuffer
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        //// Clear color and depth data on framebuffer
-        glClearColor(0.5f, 0.5f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+       glUseProgram(sceneShaderProgram);
+       int width, height;
+       glfwGetFramebufferSize(window, &width, &height);
+       glViewport(0, 0, width, height);
+       //// Bind screen as output framebuffer
+       glBindFramebuffer(GL_FRAMEBUFFER, 0);
+       //// Clear color and depth data on framebuffer
+       glClearColor(0.5f, 0.5f, 1.0f, 1.0f);
+       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(sceneShaderProgram);
 
@@ -448,13 +464,11 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         {
             // Variables to calculate distance and dot product between the camera and the individual blocks
             vec3 cameraToBlock = block.blockLocation - mainCamera.position;
-            vec3 cameraLookAt = normalize(mainCamera.lookAt);
-            float dotproduct = dot(cameraToBlock, cameraLookAt);
             float distanceFromCamera = length(vec3(cameraToBlock.x, 0.0f, cameraToBlock.z));
 
             // Render the the block only if its is within view (dotproduct) or if it is within 50.0f units from the camera
             // However, if the block is within 10.0f units from the camera, it will render no matter what. 
-            if ((abs(dotproduct) > 0.75 &&  distanceFromCamera < 500.0f) || distanceFromCamera < 20.0f)
+            if (distanceFromCamera < 500.0f)
             {
                 glBindVertexArray(planeVAO);
                 block.DrawBlock(sceneShaderProgram, worldMatrixLocation1, actualTextureLocation);
@@ -475,8 +489,8 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         glUniform1i(textureLocation1, 1);
 
         // World matrix to position and scale the ocean plane
-        mat4 oceanWorldMatrix = translate(mat4(1.0f), vec3(0.0f, -2.0f, 0.0f)) 
-            * scale(mat4(1.0f), vec3(10000.0f, 1.0f, 10000.0f));
+        mat4 oceanWorldMatrix = translate(mat4(1.0f), vec3(mainCamera.position.x, -2.0f, mainCamera.position.z))
+             * scale(mat4(1.0f), vec3(10000.0f, 1.0f, 10000.0f));
         glUniformMatrix4fv(worldMatrixLocation1, 1, GL_FALSE, &oceanWorldMatrix[0][0]);
 
         glDrawArrays(GL_TRIANGLES, 0, 6); // Draw the plane
@@ -498,14 +512,15 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         glUseProgram(skyboxShaderProgram);
         glFrontFace(GL_CW);
 
-        mat4 projMat = glm::perspective(glm::radians(mainCamera.fov), 1024 * 1.0f / 768, 0.1f, 100.0f);
-        mat4 viewMat = mat4(mat3(lookAt(mainCamera.position, mainCamera.position + mainCamera.lookAt, mainCamera.cameraUp)));
+        mat4 projMat = glm::perspective(mainCamera.fov, constant::SCREEN_WIDTH * 1.0f / constant::SCREEN_HEIGHT, 0.1f, 100.0f);
+        mat4 viewMat = mat4(mat3(lookAt(mainCamera.position,
+            mainCamera.position + mainCamera.lookAt,
+            mainCamera.cameraUp)));
+            //* rotate(mat4(1.0f), -0.01f * currentTime, vec3(0.0f, 0.0f, 1.0f));
         glUniformMatrix4fv(viewMatrixLocationS, 1, GL_FALSE, &viewMat[0][0]);
         glUniformMatrix4fv(projectionMatrixLocationS, 1, GL_FALSE, &projMat[0][0]);
 
         glBindVertexArray(skyboxVAO);
-
-        
 
         glActiveTexture(GL_TEXTURE0);
         GLuint textureLocationS = glGetUniformLocation(skyboxShaderProgram, "skyboxDay");
