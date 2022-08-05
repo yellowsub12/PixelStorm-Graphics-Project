@@ -104,8 +104,8 @@ void Camera::UpdateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, 
     // SETTING THE VIEW MATRIX
     mat4 viewMatrix = glm::lookAt(position, position + lookAt, cameraUp);
     mat4 projectionMatrix = glm::perspective(fov,
-        dWidth * 1.0f / dHeight,
-        0.01f, 800.0f);
+        constant::SCREEN_WIDTH * 1.0f / constant::SCREEN_HEIGHT,
+        0.1f, 10000.0f);
 
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
     glUniformMatrix4fv(projMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);

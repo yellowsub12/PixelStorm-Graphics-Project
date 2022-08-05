@@ -20,6 +20,7 @@ uniform float light_cutoff_outer;
 uniform float light_cutoff_inner;
 uniform float time;
 uniform bool shouldScroll;
+uniform bool affectedByLighting = true;
 
 uniform vec3 view_position;
 uniform sampler2D shadow_map;
@@ -73,7 +74,7 @@ float spotlight_scalar() {
 	
 	float angle = acos(dot(fragmentPosition - lightPosition, lightDirection)/(lightToFrag * lightPoint));
 	
-	if(abs(angle) < maximumAngle )
+	if(abs(angle) < maximumAngle)
 		return (maximumAngle  - abs(angle))/maximumAngle ;
 	else return 0.0f;
 }
@@ -103,8 +104,10 @@ void main()
 
 		chosenColor = vec3(textureColor.x, textureColor.y, textureColor.z);
 
-		
-		color = chosenColor; //(specular + diffuse + ambient) * chosenColor;
+		if(affectedByLighting)
+			color = (specular + diffuse + ambient) * chosenColor;
+		else
+			color = chosenColor;
 
 		FragColor = vec4(color, uv.z);
 }

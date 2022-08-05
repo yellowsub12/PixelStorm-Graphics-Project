@@ -309,14 +309,15 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
 
         // light parameters
-        vec3 lightPosition = vec3(100.0f * (dayNightCycleTime * sinf((currentTime * 0.1) + PI / 2)),
+        vec3 lightPosition = vec3(-100.0f * (dayNightCycleTime * sinf((currentTime * 0.1) + PI / 2)),
             100.0f*(dayNightCycleTime * sinf(currentTime * 0.1)), 
             0.0f); // the location of the light in 3D space, variable
+        //vec3 lightPosition = vec3(20.0f, 20.0f, 20.0f);
         vec3 lightFocus = vec3(0.0f, 0.0f, 1.0f);      // the point in 3D space the light "looks" at
         vec3 lightDirection = normalize(lightFocus - lightPosition);
 
         float lightNearPlane = 1.0f;
-        float lightFarPlane = 200000.0f;
+        float lightFarPlane = 8000.0f;
 
         //Setting up the light projection matrix
         mat4 lightProjectionMatrix = frustum(-1.0f, 1.0f, -1.0f, 1.0f, lightNearPlane, lightFarPlane);
@@ -481,8 +482,8 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         glUniform1i(textureLocation1, 1);
 
         // World matrix to position and scale the ocean plane
-        mat4 oceanWorldMatrix = translate(mat4(1.0f), vec3(0.0f, -2.0f, 0.0f)) 
-            * scale(mat4(1.0f), vec3(10000.0f, 1.0f, 10000.0f));
+        mat4 oceanWorldMatrix = translate(mat4(1.0f), vec3(mainCamera.position.x, -2.0f, mainCamera.position.z))
+             * scale(mat4(1.0f), vec3(10000.0f, 1.0f, 10000.0f));
         glUniformMatrix4fv(worldMatrixLocation1, 1, GL_FALSE, &oceanWorldMatrix[0][0]);
 
         glDrawArrays(GL_TRIANGLES, 0, 6); // Draw the plane
@@ -507,14 +508,12 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         mat4 projMat = glm::perspective(mainCamera.fov, constant::SCREEN_WIDTH * 1.0f / constant::SCREEN_HEIGHT, 0.1f, 100.0f);
         mat4 viewMat = mat4(mat3(lookAt(mainCamera.position,
             mainCamera.position + mainCamera.lookAt,
-            mainCamera.cameraUp)))
-            * rotate(mat4(1.0f), -0.01f * currentTime, vec3(0.0f, 0.0f, 1.0f));
+            mainCamera.cameraUp)));
+            //* rotate(mat4(1.0f), -0.01f * currentTime, vec3(0.0f, 0.0f, 1.0f));
         glUniformMatrix4fv(viewMatrixLocationS, 1, GL_FALSE, &viewMat[0][0]);
         glUniformMatrix4fv(projectionMatrixLocationS, 1, GL_FALSE, &projMat[0][0]);
 
         glBindVertexArray(skyboxVAO);
-
-        
 
         glActiveTexture(GL_TEXTURE0);
         GLuint textureLocationS = glGetUniformLocation(skyboxShaderProgram, "skyboxDay");

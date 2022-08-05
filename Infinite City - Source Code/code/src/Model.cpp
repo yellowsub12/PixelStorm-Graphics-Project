@@ -8,6 +8,7 @@ using namespace std;
 string texturesPathPrefix = "assets/textures/";
 
 GLuint cubeModelVAO = 0;
+GLuint planeVAO = 0;
 
 GLuint buildingTexture = 0;
 GLuint treeTexture = 0;
@@ -24,6 +25,7 @@ GLuint jeanslegTexture = 0;
 void Initialize()
 {
 	cubeModelVAO = createUnitCube(false);
+	planeVAO = createUnitPlane();
 
 	buildingTexture = loadTexture((texturesPathPrefix+"building.jpg").c_str());
 	treeTexture = loadTexture((texturesPathPrefix + "wood.jpg").c_str());
@@ -151,13 +153,15 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
+	glBindVertexArray(planeVAO);
+
 	glBindTexture(GL_TEXTURE_2D, soilTexture);
-	mat4 soilWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y), position.z))
+	mat4 soilWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y+0.05), position.z))
 		* scale(mat4(1.0f), vec3(tileSize, 0.525 , tileSize)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &soilWorldMatrix[0][0]);
 
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 
  }
 
