@@ -12,25 +12,26 @@
 
 using namespace glm;
 
-class Camera
-{
+class Camera {
 public:
-	vec3 position;
-	vec3 lookAt;
-	float fov;
-	vec3 cameraUp;
-	float cameraAngularSpeed;
-	float cameraSpeed;
-	float cameraVerticalLimits;
+	static vec3 position;
+	static vec3 lookAt;
+	static float fov;
+	static vec3 cameraUp;
+	static float cameraAngularSpeed;
+	static float cameraSpeed;
+	static float cameraVerticalLimits;
+	static float cameraHorizontalAngle;
+	static float cameraVerticalAngle;
 
 	Camera(); // Default Construtor
 	Camera(Camera &copyCam); // Copy Constructor 
 
-	// Method to linearly interpolate between two floats
-	float Lerp(float a, float b, float f);
 
-	// Method that updates the camera data and actually helps us control the camera. Contains all data and input handling related to Camera movement
-	void UpdateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, GLFWwindow* currentWindow);
-	GLFWscrollfun mouseWheel(int, int, int, int);
+	void setCameraPosition(vec3 newPosition);
+	void setCameraLookAt(vec3 newLookAt);
+	void setCameraHorizontalAngle(float cameraHorizontalAngle);
+	void setCameraVerticleAngle(float cameraVerticleAngle);
+	void updateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, GLFWwindow* currentWindow);
 };
 
