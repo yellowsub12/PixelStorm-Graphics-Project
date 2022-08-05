@@ -23,7 +23,7 @@ public:
 	float cameraSpeed;
 	float cameraVerticalLimits;
 
-	Camera(float camSpeed); // Paramterized constructor
+	Camera(); // Default Construtor
 	Camera(Camera &copyCam); // Copy Constructor 
 
 	// Method to linearly interpolate between two floats

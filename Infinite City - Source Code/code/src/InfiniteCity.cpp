@@ -17,9 +17,9 @@ InfiniteCity::InfiniteCity(int width, int length, int sizeBlock, Camera newCam, 
 	blockSize = sizeBlock;
 	zSpawnFrontLocation = blockSize * length/3;
 	xSpawnFrontLocation = blockSize * width/3;
-    zSpawnBackLocation = blockSize * -length/3;
-    xSpawnBackLocation = blockSize * -width/3;
-    GenerateTextureArray();
+  zSpawnBackLocation = blockSize * -length/3;
+  xSpawnBackLocation = blockSize * -width/3;
+  GenerateTextureArray();
 	SpawnStartingBlocks();
     citySeed = seed;
 
@@ -39,7 +39,7 @@ InfiniteCity::InfiniteCity(int width, int length, int sizeBlock, Camera newCam, 
 
 void InfiniteCity::GenerateTextureArray()
 {
-    std::string texturesPathPrefix = "assets/textures/";
+    string texturesPathPrefix = "assets/textures/";
 
     GLuint cityBlock1TextureID = loadTexture((texturesPathPrefix + "cityblock1.png").c_str());
     GLuint cityBlock2TextureID = loadTexture((texturesPathPrefix + "cityblock2.png").c_str());
@@ -216,19 +216,17 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
     GLuint oceanNightTextureID = loadTexture((texturesPathPrefix + "ocean_night.jpg").c_str());
 
     // Array of texture paths pertaining to the day skybox textures
-    vector<std::string> dayFaces
-    {
-        texturesPathPrefix+"skybox/right.png",
-        texturesPathPrefix+"skybox/left.png",
-        texturesPathPrefix+"skybox/top.png",
-        texturesPathPrefix+"skybox/bottom.png",
-        texturesPathPrefix+"skybox/front.png",
-        texturesPathPrefix+"skybox/back.png"
+    vector<std::string> dayFaces {
+        texturesPathPrefix + "skybox/right.png",
+        texturesPathPrefix + "skybox/left.png",
+        texturesPathPrefix + "skybox/top.png",
+        texturesPathPrefix + "skybox/bottom.png",
+        texturesPathPrefix + "skybox/front.png",
+        texturesPathPrefix + "skybox/back.png"
     };
 
     // Array of texture paths pertaining to the night skybox textures
-    vector<std::string> nightFaces
-    {
+    vector<std::string> nightFaces {
         texturesPathPrefix + "skybox/Night Skybox Textures/right.png",
         texturesPathPrefix + "skybox/Night Skybox Textures/left.png",
         texturesPathPrefix + "skybox/Night Skybox Textures/top.png",
@@ -250,7 +248,6 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
     GLuint worldMatrixLocationS = glGetUniformLocation(skyboxShaderProgram, "worldMatrix");
     GLuint actualTextureLocation = glGetUniformLocation(sceneShaderProgram, "actualTexture");
 
-
     //Important Light Parameters
     const float ambient = 0.15f;
     const float diffuse = 0.6f;
@@ -262,7 +259,6 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
     // Disable the cursor
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
 
     // Other OpenGL states to set once
     // Enable Backface culling
@@ -277,7 +273,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
 	while (!glfwWindowShouldClose(window))
 	{
-        double currentTime = glfwGetTime();
+        float currentTime = static_cast<float>(glfwGetTime());
         nbFrames++;
         if (currentTime - lastTime >= 1.0) { // If last prinf() was more than 1 sec ago
             // printf and reset timer
@@ -287,7 +283,6 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         }
 
         currentCityTime = dayNightCycleTime * sinf(currentTime*0.1); // Update the time in the city
-
 
         /*int WIDTH, HEIGHT;
         glfwGetFramebufferSize(window, &WIDTH, &HEIGHT);
@@ -427,7 +422,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
        glUseProgram(sceneShaderProgram);
 
 
-        //Setting the values of ambient, diffuse and specular strengths in the activeShader
+        // Setting the values of ambient, diffuse and specular strengths in the activeShader
         glUniform1f(glGetUniformLocation(sceneShaderProgram, "ambientStrength"), ambient);
         glUniform1f(glGetUniformLocation(sceneShaderProgram, "diffuseStrength"), diffuse);
         glUniform1f(glGetUniformLocation(sceneShaderProgram, "specularStrength"), specular);

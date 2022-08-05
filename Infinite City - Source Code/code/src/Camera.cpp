@@ -3,16 +3,17 @@
 #define GLEW_STATIC 1
 #include <GL/glew.h>   
 #include <iostream>
+#include <constants.hpp>
 
 
-Camera::Camera(float camSpeed) {
-	position = vec3(0.0f, 0.0f, 0.0f);
+Camera::Camera() {
+	position = vec3(0.0f, 2.0f, 0.0f);
 	lookAt = vec3(0.0f);
 	fov = 70.0f;
     cameraAngularSpeed = 10.0f;
     cameraUp = vec3(0.0f, 1.0f, 0.0f);
-    cameraSpeed = camSpeed;
-    cameraVerticalLimits = 85.0f;
+    cameraSpeed = constant::SLOW_CAMERA_SPEED;
+    cameraVerticalLimits = 89.0f;
 }
 
 Camera::Camera(Camera &copyCam) {
@@ -52,34 +53,50 @@ void Camera::UpdateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, 
     lookAt = vec3(cosf(phi) * cosf(theta), sinf(phi), -cosf(phi) * sinf(theta));
 
     vec3 frontVector = normalize(lookAt);
+    frontVector.y = 0.0f;
     vec3 sideVector = normalize(cross(frontVector, cameraUp));
-    //std::cout << frontVector.x << std::endl;
 
-    if (glfwGetKey(currentWindow, GLFW_KEY_A) == GLFW_PRESS) // move camera to the left
+    if (glfwGetKey(currentWindow, GLFW_KEY_W) == GLFW_PRESS) // forward
+    {
+        position += frontVector * cameraSpeed * dt;
+    }
+
+    if (glfwGetKey(currentWindow, GLFW_KEY_S) == GLFW_PRESS) // backward
+    {
+        position -= frontVector * cameraSpeed * dt;
+    }
+
+    if (glfwGetKey(currentWindow, GLFW_KEY_A) == GLFW_PRESS) // left
     {
         position -= sideVector * cameraSpeed * dt;
 
     }
 
-    if (glfwGetKey(currentWindow, GLFW_KEY_D) == GLFW_PRESS) // move camera to the right
+    if (glfwGetKey(currentWindow, GLFW_KEY_D) == GLFW_PRESS) // right
     {
         position += sideVector * cameraSpeed * dt;
     }
 
-    if (glfwGetKey(currentWindow, GLFW_KEY_S) == GLFW_PRESS) // move camera up
-    {
-        position -= frontVector * cameraSpeed * dt;
+    if (glfwGetKey(currentWindow, GLFW_KEY_SPACE) == GLFW_PRESS) { //go up
+        position.y = min(constant::CAMERA_MAX_HEIGHT, position.y + cameraSpeed * 0.02f);
+
     }
 
-    if (glfwGetKey(currentWindow, GLFW_KEY_W) == GLFW_PRESS) // move camera down
-    {
-        position += frontVector * cameraSpeed * dt;
+    if (glfwGetKey(currentWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) { //sprint
+        position.y = max(constant::CAMERA_MIN_HEIGHT, position.y - cameraSpeed * 0.02f);
+    }
+
+    if (glfwGetKey(currentWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) { //sprint
+        cameraSpeed = constant::FAST_CAMERA_SPEED;
+    } else {
+        cameraSpeed = constant::SLOW_CAMERA_SPEED;
     }
 
     if (glfwGetKey(currentWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS) // close program
     {
         glfwSetWindowShouldClose(currentWindow, true);
     }
+
     
     int dWidth, dHeight;
     glfwGetFramebufferSize(currentWindow, &dWidth, &dHeight);
