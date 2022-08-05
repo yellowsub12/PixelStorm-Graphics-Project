@@ -8,21 +8,23 @@
 #include <random>
 #include "Model.h"
 #include <constants.hpp>
+#include "Controls.h"
+
 
 using namespace std;
 
-InfiniteCity::InfiniteCity(int width, int length, int sizeBlock, Camera newCam, int seed) : mainCamera(newCam)
-{
-	cityLength = length;
-	cityWidth = width;
-	blockSize = sizeBlock;
-	zSpawnFrontLocation = blockSize * length/3;
-	xSpawnFrontLocation = blockSize * width/3;
-  zSpawnBackLocation = blockSize * -length/3;
-  xSpawnBackLocation = blockSize * -width/3;
-  GenerateTextureArray();
-	SpawnStartingBlocks();
+InfiniteCity::InfiniteCity(int width, int length, int sizeBlock, int seed) {
+    cityLength = length;
+    cityWidth = width;
+    blockSize = sizeBlock;
+    zSpawnFrontLocation = blockSize * length/3;
+    xSpawnFrontLocation = blockSize * width/3;
+    zSpawnBackLocation = blockSize * -length/3;
+    xSpawnBackLocation = blockSize * -width/3;
+    GenerateTextureArray();
+    SpawnStartingBlocks();
     citySeed = seed;
+    mainCamera = Camera();
 
     InfinitePathRowFStartNumber = 0;
     InfinitePathRowFEndNumber = 0;
@@ -270,21 +272,25 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
     glEnable(GL_DEPTH_TEST);
 
     // For framerate calculation
-    double lastTime = glfwGetTime();
+
+    float lastFrameTime = static_cast<float>(glfwGetTime());
     int nbFrames = 0;
 
 	while (!glfwWindowShouldClose(window))
-	{
+	{   
+        float dt = static_cast<float>(glfwGetTime()) - lastFrameTime;
+        lastFrameTime += dt;
+
         float currentTime = static_cast<float>(glfwGetTime());
         nbFrames++;
-        if (currentTime - lastTime >= 1.0) { // If last prinf() was more than 1 sec ago
+        if (currentTime - lastFrameTime >= 1.0) { // If last prinf() was more than 1 sec ago
             // printf and reset timer
             printf("%f ms/frame\n", 1000.0/double(nbFrames));
             nbFrames = 0;
-            lastTime += 1.0;
+            lastFrameTime += 1.0;
         }
 
-        currentCityTime = dayNightCycleTime * sinf(currentTime*0.1); // Update the time in the city
+        currentCityTime = dayNightCycleTime * sinf(currentTime*0.1f); // Update the time in the city
 
         int WIDTH, HEIGHT;
         glfwGetFramebufferSize(window, &WIDTH, &HEIGHT);
@@ -423,6 +429,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         // |---------------------------------------------------------------------------------------------------------------------------|
 
 
+
        glUseProgram(sceneShaderProgram);
        int width, height;
        glfwGetFramebufferSize(window, &width, &height);
@@ -433,7 +440,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
        glClearColor(0.5f, 0.5f, 1.0f, 1.0f);
        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-       glUseProgram(sceneShaderProgram);
+        glUseProgram(sceneShaderProgram);
 
 
         // Setting the values of ambient, diffuse and specular strengths in the activeShader
@@ -539,13 +546,13 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
         glUseProgram(sceneShaderProgram);
 
-
-
         // End Frame
         glfwSwapBuffers(window);
         glfwPollEvents();           
 
-        mainCamera.UpdateCamera(viewMatrixLocation, projectionMatrixLocation, window);
+        Controls::globalControls(window);
+        Controls::firstPersonControls(window, dt);
+        mainCamera.updateCamera(viewMatrixLocation, projectionMatrixLocation, window);
 
         
 	}

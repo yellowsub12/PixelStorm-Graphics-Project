@@ -46,7 +46,7 @@ public:
 	int InfinitePathColumnBEndNumber;
 
 
-	InfiniteCity(int width, int length, int sizeBlock, Camera newCam, int seed);
+	InfiniteCity(int width, int length, int sizeBlock, int seed);
 
 	// Method to spawn the starting series of blocks in the city when the program starts
 	void SpawnStartingBlocks(); 
