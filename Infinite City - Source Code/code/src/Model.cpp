@@ -153,7 +153,7 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 
 	glBindTexture(GL_TEXTURE_2D, soilTexture);
 	mat4 soilWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y), position.z))
-		* scale(mat4(1.0f), vec3(tileSize, 0.025 , tileSize)); //(0.5*(1+randomFactor))+scaleOffset
+		* scale(mat4(1.0f), vec3(tileSize, 0.525 , tileSize)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &soilWorldMatrix[0][0]);
 
