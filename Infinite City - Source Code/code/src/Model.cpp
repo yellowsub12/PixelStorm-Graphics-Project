@@ -480,16 +480,34 @@ void DrawLamp(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 
 	//Lamp Base
 	mat4 lampBase = translate(mat4(1.0f), finalPosition)
-		* scale(mat4(1.0f), vec3(tileSize / 12, 3.4f, tileSize / 12));
+		* scale(mat4(1.0f), vec3(tileSize / 16, 26.4f, tileSize / 16));
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampBase[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	//Lamp Hat
+	mat4 lampHat = lampBase * translate(mat4(1.0f), vec3(0.0f, 0.5f, 0.0f)) * scale(mat4(1.0f), vec3(3.0f, 0.02f, 3.0f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampHat[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	//Lamp pike
+	lampHat = lampBase * translate(mat4(1.0f), vec3(0.0f, 0.55f, 0.0f)) * scale(mat4(1.0f), vec3(0.5f, 0.08f, 0.5f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampHat[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	//Lamp pike 2
+	lampHat = lampBase * translate(mat4(1.0f), vec3(0.0f, 0.44f, 0.0f)) * scale(mat4(1.0f), vec3(2.5f, 0.01f, 2.5f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampHat[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	glBindTexture(GL_TEXTURE_2D, headlightTexture);
 
 	//Lamp Hood
-	mat4 carHood = lampBase * translate(mat4(1.0f), vec3(0.0f, 0.45f, 0.0f)) * scale(mat4(1.0f), vec3(3.0f, 0.15f, 3.0f));
-	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &carHood[0][0]);
+	mat4 lampHood = lampBase * translate(mat4(1.0f), vec3(0.0f, 0.48f, 0.0f)) * scale(mat4(1.0f), vec3(2.0f, 0.06f, 2.0f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampHood[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
