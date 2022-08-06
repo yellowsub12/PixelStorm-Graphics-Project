@@ -25,10 +25,22 @@ GLuint trashTexture = 0;
 GLuint trashbinTexture = 0;
 GLuint phoneboothTexture = 0;
 GLuint upperphoneboothTexture = 0;
+unsigned int humanHeadTexture1;
 
 
 void Initialize()
 {
+	vector<std::string> humanHead1{
+		texturesPathPrefix + "HumanHead/right.png",
+		texturesPathPrefix + "HumanHead/left.png",
+		texturesPathPrefix + "HumanHead/top.png",
+		texturesPathPrefix + "HumanHead/bottom.png",
+		texturesPathPrefix + "HumanHead/front.png",
+		texturesPathPrefix + "HumanHead/back.png"
+	};
+
+	humanHeadTexture1 = loadCubemap(humanHead1);
+
 	cubeModelVAO = createUnitCube(false);
 	planeVAO = createUnitPlane();
 
@@ -51,7 +63,7 @@ void Initialize()
 
 }
 
-void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocation, GLuint textureLocation)
+void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocation, GLuint textureLocation, GLuint shaderProgram)
 {
 	if (blockType == 5)
 	{
@@ -60,21 +72,26 @@ void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocati
 	else if (blockType == 4)
 	{
 		int random_integer;
-		int lowest = 1, highest = 2;
+		int lowest = 1, highest = 3;
 		int range = (highest - lowest) + 1;
 		random_integer = lowest + rand() % range;
 		if (random_integer == 1) {
-			DrawPhonebooth(position, tileSize, worldMatrixLocation, textureLocation);
+			//DrawPhonebooth(position, tileSize, worldMatrixLocation, textureLocation);
+			DrawHuman(position, tileSize, worldMatrixLocation, textureLocation, shaderProgram);
 		}
 		if (random_integer == 2)
 		{
 			DrawBench(position, tileSize, worldMatrixLocation, textureLocation);
 		}
+		if (random_integer == 3)
+		{
+			DrawTree(position, tileSize, worldMatrixLocation, textureLocation);
+		}
 	}
 	else 
 	{
 		int random_integer;
-		int lowest = 1, highest = 2;
+		int lowest = 1, highest = 3;
 		int range = (highest - lowest) + 1;
 		random_integer = lowest + rand() % range;
 		if (random_integer == 1) {
@@ -83,6 +100,10 @@ void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocati
 		if (random_integer == 2)
 		{
 			DrawBuilding(position, tileSize, worldMatrixLocation, textureLocation);
+		}
+		if (random_integer == 3)
+		{
+			DrawTree(position, tileSize, worldMatrixLocation, textureLocation);
 		}
 	}
 }
@@ -306,7 +327,7 @@ void DrawPhonebooth(vec3 position, float tileSize, GLuint worldMatrixLocation, G
 
 
 
-void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
+void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation, GLuint shaderProgram)
 {
 	int probabilityCheck = rand() % 100; // Variable to help us adjust what numbers spawn more often and what numbers spawn less often. 
 	int randomHumanFactor = 9; // The random factor which affects the scale of the building.// = rand() % 11; 
@@ -389,10 +410,17 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
+	glActiveTexture(GL_TEXTURE0 + 2);
+	GLuint textureLocationCube = glGetUniformLocation(shaderProgram, "actualCubeTexture");
+	glBindTexture(GL_TEXTURE_CUBE_MAP, humanHeadTexture1);
+	glUniform1i(textureLocationCube, 2);
+
+	glUniform1i(glGetUniformLocation(shaderProgram, "applyCubeTexture"), true);
+	
 
 	// Head
-	glBindTexture(GL_TEXTURE_2D, frontTexture);
-	glUniform1i(textureLocation, 1);
+	//glBindTexture(GL_TEXTURE_2D, frontTexture);
+	//glUniform1i(textureLocation, 1);
 
 	mat4 headWorldMatrix = BodyMatrix *  translate(mat4(1.0f), vec3(0, 0.75, -0.05))
 		* scale(mat4(1.0f), vec3(0.8, 0.5, 1.6)); //(0.5*(1+randomFactor))+scaleOffset
@@ -400,6 +428,8 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &headWorldMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	glUniform1i(glGetUniformLocation(shaderProgram, "applyCubeTexture"), false);
 
 
 

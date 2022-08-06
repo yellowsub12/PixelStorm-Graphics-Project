@@ -21,10 +21,12 @@ uniform float light_cutoff_inner;
 uniform float time;
 uniform bool shouldScroll;
 uniform bool affectedByLighting = true;
+uniform bool applyCubeTexture = false;
 
 uniform vec3 view_position;
 uniform sampler2D shadow_map;
 uniform sampler2D actualTexture;
+uniform samplerCube actualCubeTexture;
 
 uniform bool shouldRenderShadows;
 uniform bool shouldRenderColors;
@@ -63,7 +65,7 @@ float shadow_scalar() {
     // get depth of current fragment from light's perspective
     float current_depth = normalized_device_coordinates.z;
     // check whether current frag pos is in shadow
-    float bias = 0.0005;
+    float bias = 0.0000;
     return ((current_depth - bias) < closest_depth) ? 1.0 : 0.0;
 }
 
@@ -100,7 +102,11 @@ void main()
 		else
 			actualUV = vec2(uv.x, uv.y);
 			
-		vec4 textureColor = texture(actualTexture, actualUV);
+		vec4 textureColor;
+		if(applyCubeTexture)
+			textureColor = texture(actualCubeTexture, vertexPosition);
+		else
+			textureColor = texture(actualTexture, actualUV);
 
 		chosenColor = vec3(textureColor.x, textureColor.y, textureColor.z);
 
