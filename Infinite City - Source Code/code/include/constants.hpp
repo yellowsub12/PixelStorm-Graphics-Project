@@ -8,6 +8,7 @@ namespace constant {
     const long PROCEDURAL_SEED = 1659637606l;
     const float SLOW_CAMERA_SPEED = 20.0f;
     const float FAST_CAMERA_SPEED = 50.0f;
+    const float CAMERA_ANGULAR_SPEED = 50.0f;
 
     const float CAMERA_MIN_HEIGHT = 1.5f;
     const float CAMERA_MAX_HEIGHT = 100.0f;

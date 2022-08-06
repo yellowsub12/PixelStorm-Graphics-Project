@@ -22,7 +22,7 @@ void Controls::globalControls(GLFWwindow* window){
 
     // reset camera to (0,0,0)
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-        Camera::position = vec3(0.0f, 0.0f, 0.0f);
+        Camera::position = vec3(0.0f, 2.5f, 0.0f);
     }
 }
 
@@ -87,11 +87,14 @@ void Controls::firstPersonControls(GLFWwindow* window, float dt) {
         Camera::cameraSpeed = constant::SLOW_CAMERA_SPEED;
     }
 
+    // right click to zoom
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) { //sprint
         Camera::fov = 69.4f;
         Camera::cameraSpeed = constant::SLOW_CAMERA_SPEED * 0.5f;
+        Camera::cameraAngularSpeed = constant::CAMERA_ANGULAR_SPEED * 0.3f;
     } else {
         Camera::fov = 70.0f;
+        Camera::cameraAngularSpeed = constant::CAMERA_ANGULAR_SPEED;
     }
 
     lastMousePosX = mousePosX;

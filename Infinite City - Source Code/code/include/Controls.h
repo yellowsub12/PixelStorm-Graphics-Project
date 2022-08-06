@@ -3,7 +3,6 @@
 
 class Controls {
     public:
-        static int shiftState;
         static double lastMousePosX;
         static double lastMousePosY;
 
