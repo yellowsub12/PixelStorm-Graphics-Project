@@ -23,7 +23,9 @@ GLuint jeanslegTexture = 0;
 GLuint redTexture = 0;
 GLuint blackTexture = 0;
 GLuint whiteTexture = 0;
-GLuint yellowTexture = 0;
+GLuint headlightTexture = 0;
+GLuint glassTexture = 0;
+GLuint tireTexture = 0;
 
 
 void Initialize()
@@ -44,7 +46,9 @@ void Initialize()
 	redTexture = loadTexture((texturesPathPrefix + "red.jpg").c_str());
 	blackTexture = loadTexture((texturesPathPrefix + "black.jpg").c_str());
 	whiteTexture = loadTexture((texturesPathPrefix + "white.jpg").c_str());
-	yellowTexture = loadTexture((texturesPathPrefix + "yellow.jpg").c_str());
+	headlightTexture = loadTexture((texturesPathPrefix + "headlight.jpg").c_str());
+	glassTexture = loadTexture((texturesPathPrefix + "glass.jpg").c_str());
+	tireTexture = loadTexture((texturesPathPrefix + "tire.jpg").c_str());
 }
 
 void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocation, GLuint textureLocation)
@@ -322,7 +326,6 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 }
 
 
-
 void DrawSpaceTower(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
 {
 	glBindVertexArray(cubeModelVAO);
@@ -359,38 +362,37 @@ void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint t
 
 	vec3 finalPosition = vec3(position.x, position.y + (0.1 * (1 + randomFactor)) / 2, position.z);
 
-	//mat4 tileWorldMatrix = translate(mat4(1.0f), finalPosition)
-	//	* scale(mat4(1.0f), vec3(tileSize / 5, 0.25f, tileSize / 5)); //(0.5*(1+randomFactor))+scaleOffset
-
-	//SkateBase1
+	//Car Base
 	mat4 carBase = translate(mat4(1.0f), finalPosition) 
-		* scale(mat4(1.0f), vec3(tileSize / 6, 0.3f, tileSize / 12));
+		* scale(mat4(1.0f), vec3(tileSize / 2, 0.25f, tileSize / 3));
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &carBase[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
 
+	glBindTexture(GL_TEXTURE_2D, blackTexture);
 
-	glBindTexture(GL_TEXTURE_2D, whiteTexture);
-	//Car Base
-	mat4 skateB3 = carBase * translate(mat4(1.0f), vec3(-0.15f, 1.4f, 0.0f)) * scale(mat4(1.0f), vec3(0.6f, 0.2f, 1.0f));
-	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &skateB3[0][0]);
+	//Car Hood
+	mat4 carHood = carBase * translate(mat4(1.0f), vec3(-0.15f, 1.4f, 0.0f)) * scale(mat4(1.0f), vec3(0.6f, 0.2f, 1.0f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &carHood[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
 
+	glBindTexture(GL_TEXTURE_2D, whiteTexture);
+
 	//Wheel rim front
-	mat4 wheels = carBase * translate(mat4(1.0f), vec3(0.35f, 0.1f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.12f));
+	mat4 wheels = carBase * translate(mat4(1.0f), vec3(0.35f, 0.06f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.12f));
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
 
 	//Wheel rim back
-	wheels = carBase * translate(mat4(1.0f), vec3(-0.35f, 0.1f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.12f));
+	wheels = carBase * translate(mat4(1.0f), vec3(-0.35f, 0.06f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.12f));
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
 
 	//Mirrors
-	wheels = carBase * translate(mat4(1.0f), vec3(0.12f, 0.2f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.2f));
+	wheels = carBase * translate(mat4(1.0f), vec3(0.1f, 0.22f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.2f));
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
@@ -407,7 +409,7 @@ void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint t
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
 
-	glBindTexture(GL_TEXTURE_2D, yellowTexture);
+	glBindTexture(GL_TEXTURE_2D, headlightTexture);
 
 	//Headlights R
 	wheels = carBase * translate(mat4(1.0f), vec3(0.48f, 0.2f, 0.35f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 0.15f));
@@ -421,13 +423,15 @@ void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint t
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
 
-	glBindTexture(GL_TEXTURE_2D, blackTexture);
+	glBindTexture(GL_TEXTURE_2D, glassTexture);
 
 	//SkateBase3
-	 skateB3 = carBase * translate(mat4(1.0f), vec3(-0.15f, 0.9f, 0.0f)) * scale(mat4(1.0f), vec3(0.6f, 0.8f, 1.0f));
-	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &skateB3[0][0]);
+	 carHood = carBase * translate(mat4(1.0f), vec3(-0.15f, 0.9f, 0.0f)) * scale(mat4(1.0f), vec3(0.6f, 0.8f, 1.0f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &carHood[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+	
+	glBindTexture(GL_TEXTURE_2D, tireTexture);
 
 	//Wheel front
 	 wheels = carBase * translate(mat4(1.0f), vec3(0.35f, -0.05f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.0f, 1.1f));
@@ -440,6 +444,8 @@ void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint t
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+
+	glBindTexture(GL_TEXTURE_2D, blackTexture);
 
 	//rim up
 	wheels = carBase * translate(mat4(1.0f), vec3(0.47f, 0.16f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.15f, 0.5f));
