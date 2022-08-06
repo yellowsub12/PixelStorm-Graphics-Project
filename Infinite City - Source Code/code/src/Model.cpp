@@ -459,3 +459,38 @@ void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint t
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
 }
+
+void DrawLamp(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
+{
+
+	int probabilityCheck = rand() % 100; // Variable to help us adjust what numbers spawn more often and what numbers spawn less often. 
+	int randomFactor = 0; // The random factor which affects the scale of the building.// = rand() % 11; 
+	if (probabilityCheck < 2) randomFactor = 9; // less than 2% of buildings will be 15 units tall
+	if (probabilityCheck >= 2 && probabilityCheck < 30) randomFactor = rand() % 7; // around 28% of the city will be buildings that are between 3 to 5 units tall
+	if (probabilityCheck >= 30 && probabilityCheck < 50) randomFactor = rand() % 6; // around 20% of the city will be buildings that are between 4 to 6 units tall
+	if (probabilityCheck >= 50) randomFactor = rand() % 5; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
+
+	glBindVertexArray(cubeModelVAO);
+
+	vec3 finalPosition = vec3(position.x, position.y + (0.1 * (1 + randomFactor)) / 2, position.z);
+
+	// Assign texture to the building
+	glBindTexture(GL_TEXTURE_2D, blackTexture);
+	glUniform1i(textureLocation, 1);
+
+	//Lamp Base
+	mat4 lampBase = translate(mat4(1.0f), finalPosition)
+		* scale(mat4(1.0f), vec3(tileSize / 12, 3.4f, tileSize / 12));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampBase[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	glBindTexture(GL_TEXTURE_2D, headlightTexture);
+
+	//Lamp Hood
+	mat4 carHood = lampBase * translate(mat4(1.0f), vec3(0.0f, 0.45f, 0.0f)) * scale(mat4(1.0f), vec3(3.0f, 0.15f, 3.0f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &carHood[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+}
