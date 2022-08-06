@@ -457,7 +457,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         GLuint textureLocation = glGetUniformLocation(sceneShaderProgram, "shadow_map");
         glBindTexture(GL_TEXTURE_2D, depth_map_texture);
         glUniform1i(textureLocation, 0);
-        glActiveTexture(GL_TEXTURE0+1);
+        glActiveTexture(GL_TEXTURE0 + 1);
         GLuint textureLocation1 = glGetUniformLocation(sceneShaderProgram, "actualTexture");
         glBindTexture(GL_TEXTURE_2D, testTexture);
         glUniform1i(textureLocation, 1);

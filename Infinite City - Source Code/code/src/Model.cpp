@@ -416,11 +416,7 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 	glUniform1i(textureLocationCube, 2);
 
 	glUniform1i(glGetUniformLocation(shaderProgram, "applyCubeTexture"), true);
-	
-
-	// Head
-	//glBindTexture(GL_TEXTURE_2D, frontTexture);
-	//glUniform1i(textureLocation, 1);
+	;
 
 	mat4 headWorldMatrix = BodyMatrix *  translate(mat4(1.0f), vec3(0, 0.75, -0.05))
 		* scale(mat4(1.0f), vec3(0.8, 0.5, 1.6)); //(0.5*(1+randomFactor))+scaleOffset
@@ -429,10 +425,8 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
+	glActiveTexture(GL_TEXTURE0 + 1);
 	glUniform1i(glGetUniformLocation(shaderProgram, "applyCubeTexture"), false);
-
-
-
 
 }
 
