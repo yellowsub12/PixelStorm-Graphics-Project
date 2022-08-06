@@ -25,6 +25,17 @@ GLuint trashTexture = 0;
 GLuint trashbinTexture = 0;
 GLuint phoneboothTexture = 0;
 GLuint upperphoneboothTexture = 0;
+GLuint busfrontTexture = 0;
+GLuint busbackTexture = 0;
+GLuint busbottomTexture = 0;
+GLuint bustopTexture = 0;
+GLuint busleftTexture = 0;
+GLuint busrightTexture = 0;
+GLuint wheelTexture = 0;
+GLuint rimTexture = 0;
+GLuint antennaTexture = 0;
+GLuint antenna2Texture = 0;
+
 
 
 void Initialize()
@@ -46,6 +57,17 @@ void Initialize()
 	trashbinTexture = loadTexture((texturesPathPrefix + "trashbin.jpg").c_str());
 	phoneboothTexture = loadTexture((texturesPathPrefix + "phonebooth.jpg").c_str());
 	upperphoneboothTexture = loadTexture((texturesPathPrefix + "upperphonebooth.jpg").c_str());
+	busfrontTexture = loadTexture((texturesPathPrefix + "busfront.png").c_str());
+	busbackTexture = loadTexture((texturesPathPrefix + "busback.png").c_str());
+	bustopTexture = loadTexture((texturesPathPrefix + "bustop.png").c_str());
+	busbottomTexture = loadTexture((texturesPathPrefix + "busbottom.jpg").c_str());
+	busleftTexture = loadTexture((texturesPathPrefix + "busleft.png").c_str());
+	busrightTexture = loadTexture((texturesPathPrefix + "busright.png").c_str());
+	wheelTexture = loadTexture((texturesPathPrefix + "wheel.png").c_str());
+	rimTexture = loadTexture((texturesPathPrefix + "rim.png").c_str());
+	antennaTexture = loadTexture((texturesPathPrefix + "antenna.png").c_str());
+	antenna2Texture = loadTexture((texturesPathPrefix + "antenna2.png").c_str());
+
 
 	towerTexture = loadTexture((texturesPathPrefix + "SpaceTower.jpg").c_str());
 
@@ -78,7 +100,7 @@ void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocati
 		int range = (highest - lowest) + 1;
 		random_integer = lowest + rand() % range;
 		if (random_integer == 1) {
-			DrawTrashBin(position, tileSize, worldMatrixLocation, textureLocation);
+			DrawBus(position, tileSize, worldMatrixLocation, textureLocation);
 		}
 		if (random_integer == 2)
 		{
@@ -309,12 +331,12 @@ void DrawPhonebooth(vec3 position, float tileSize, GLuint worldMatrixLocation, G
 void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
 {
 	int probabilityCheck = rand() % 100; // Variable to help us adjust what numbers spawn more often and what numbers spawn less often. 
-	int randomHumanFactor = 9; // The random factor which affects the scale of the building.// = rand() % 11; 
+	int randomBusFactor = 9; // The random factor which affects the scale of the building.// = rand() % 11; 
 	int randomFactor = 6;
-	if (probabilityCheck < 2) randomHumanFactor = 7; // less than 2% of buildings will be 15 units tall
-	if (probabilityCheck >= 2 && probabilityCheck < 30) randomHumanFactor = rand() % 9; // around 28% of the city will be buildings that are between 3 to 5 units tall
-	if (probabilityCheck >= 30 && probabilityCheck < 50) randomHumanFactor = rand() % 10; // around 20% of the city will be buildings that are between 4 to 6 units tall
-	if (probabilityCheck >= 50) randomHumanFactor = rand() % 8; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
+	if (probabilityCheck < 2) randomBusFactor = 7; // less than 2% of buildings will be 15 units tall
+	if (probabilityCheck >= 2 && probabilityCheck < 30) randomBusFactor = rand() % 9; // around 28% of the city will be buildings that are between 3 to 5 units tall
+	if (probabilityCheck >= 30 && probabilityCheck < 50) randomBusFactor = rand() % 10; // around 20% of the city will be buildings that are between 4 to 6 units tall
+	if (probabilityCheck >= 50) randomBusFactor = rand() % 8; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
 
 	glBindVertexArray(cubeModelVAO);
 
@@ -405,6 +427,231 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 
 
 }
+
+
+void DrawBus(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
+{
+	int probabilityCheck = rand() % 100; // Variable to help us adjust what numbers spawn more often and what numbers spawn less often. 
+	int randomBusFactor = 9; // The random factor which affects the scale of the building.// = rand() % 11; 
+	if (probabilityCheck < 2) randomBusFactor = 7; // less than 2% of buildings will be 15 units tall
+	if (probabilityCheck >= 2 && probabilityCheck < 30) randomBusFactor = rand() % 9; // around 28% of the city will be buildings that are between 3 to 5 units tall
+	if (probabilityCheck >= 30 && probabilityCheck < 50) randomBusFactor = rand() % 10; // around 20% of the city will be buildings that are between 4 to 6 units tall
+	if (probabilityCheck >= 50) randomBusFactor = rand() % 8; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
+
+	glBindVertexArray(cubeModelVAO);
+
+	mat4 initialPosition = mat4(1.0);
+	mat4 initialScale = mat4(1.0);
+	mat4 initialRotation = mat4(1.0);
+
+
+	/*GLuint busfrontTexture = 0;
+	GLuint busbackTexture = 0;
+	GLuint busbottomTexture = 0;
+	GLuint bustopTexture = 0;
+	GLuint busleftTexture = 0;
+	GLuint busrightTexture = 0;*/
+
+
+	vec3 finalPosition = vec3(position.x, position.y, position.z);
+
+	// Front
+	glBindTexture(GL_TEXTURE_2D, busfrontTexture);
+	glUniform1i(textureLocation, 1);
+
+
+
+	mat4 frontBodyMatrix = initialPosition * translate(mat4(1.0f), vec3(position.x, position.y + 2.3, position.z -6 )) * initialRotation * rotate(mat4(1.0f), 3.14159f, vec3(1.0f, 0.0f, 0.0f))
+		* scale(mat4(1.0f), vec3(4, 4, 0.1)) * initialScale; //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &frontBodyMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+	// Back 
+	glBindTexture(GL_TEXTURE_2D, busbackTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 busbackWorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(0, 0, -130 ))
+		* scale(mat4(1.0f), vec3(1, 1, 1)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &busbackWorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// Top
+	glBindTexture(GL_TEXTURE_2D, bustopTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 bustopWorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(0, -0.5, -65))
+		* scale(mat4(1.0f), vec3(1, 0.001, 131.0)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &bustopWorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// Bottom
+	glBindTexture(GL_TEXTURE_2D, busbottomTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 busbottomWorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(0, 0.5, -65))
+		* scale(mat4(1.0f), vec3(1, 0.001, 131.0)); //(0.5*(1+randomFactor))+scaleOffset
+
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &busbottomWorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// Left
+	glBindTexture(GL_TEXTURE_2D, busleftTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 busleftWorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(-0.5, 0, -65)) 
+		* scale(mat4(1.0f), vec3(0.001, 1, 131)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &busleftWorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+	// Right
+	glBindTexture(GL_TEXTURE_2D, busrightTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 busrightWorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(0.5, 0, -65))
+		* scale(mat4(1.0f), vec3(0.001, 1, 131)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &busrightWorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// Wheel 1 
+
+	glBindTexture(GL_TEXTURE_2D, wheelTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 wheel1WorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(-0.505, 0.41, -28.5))
+		* scale(mat4(1.0f), vec3(0.07, 0.30, 11.0)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheel1WorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+	// Wheel 2 
+
+	glBindTexture(GL_TEXTURE_2D, wheelTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 wheel2WorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(-0.505, 0.41, -94.5))
+		* scale(mat4(1.0f), vec3(0.07, 0.30, 11.0)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheel2WorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// Wheel 3
+
+	glBindTexture(GL_TEXTURE_2D, wheelTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 wheel3WorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(0.505, 0.41, -28.5))
+		* scale(mat4(1.0f), vec3(0.07, 0.30, 11.0)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheel3WorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+	// Wheel 4 
+
+	glBindTexture(GL_TEXTURE_2D, wheelTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 wheel4WorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(0.505, 0.41, -94.5))
+		* scale(mat4(1.0f), vec3(0.07, 0.30, 11.0)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheel4WorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// rim 1 
+
+	glBindTexture(GL_TEXTURE_2D, rimTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 rim1WorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(-0.522, 0.41, -28.5))
+		* scale(mat4(1.0f), vec3(0.04, 0.298, 10.9)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &rim1WorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+	// rim 2 
+
+	glBindTexture(GL_TEXTURE_2D, rimTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 rim2WorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(-0.522, 0.41, -94.5))
+		* scale(mat4(1.0f), vec3(0.04, 0.298, 10.9)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &rim2WorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// rim 3
+
+	glBindTexture(GL_TEXTURE_2D, rimTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 rim3WorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(0.522, 0.41, -28.5))
+		* scale(mat4(1.0f), vec3(0.04, 0.298, 10.9)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &rim3WorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+	// rim 4 
+
+	glBindTexture(GL_TEXTURE_2D, rimTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 rim4WorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(0.522, 0.41, -94.5))
+		* scale(mat4(1.0f), vec3(0.04, 0.298, 10.9)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &rim4WorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// Antenna 
+
+	glBindTexture(GL_TEXTURE_2D, antennaTexture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 antennaWorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(0.35, -0.7, -110.5))
+		* scale(mat4(1.0f), vec3(0.025, 0.38, 0.9)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &antennaWorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	// Antenna 2
+
+	glBindTexture(GL_TEXTURE_2D, antenna2Texture);
+	glUniform1i(textureLocation, 1);
+
+	mat4 antenna2WorldMatrix = frontBodyMatrix * translate(mat4(1.0f), vec3(0.42, -0.6, -110.5))
+		* scale(mat4(1.0f), vec3(0.025, 0.33, 0.9)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &antenna2WorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+}
+
 
 
 
