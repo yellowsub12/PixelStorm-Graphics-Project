@@ -27,13 +27,16 @@ void DrawBench(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 
 void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation, GLuint shaderProgram);
 
+void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
+
 void DrawTrashBin(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
 void DrawPhonebooth(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
+void DrawBus(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
+
 void CollisionCheck(vec3 objectPosition, vec3 objectScale);
 
-
-void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation);
+void DrawLamp(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
 #endif MODEL_H
