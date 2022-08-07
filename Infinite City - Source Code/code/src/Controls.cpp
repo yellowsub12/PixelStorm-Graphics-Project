@@ -136,7 +136,7 @@ void Controls::firstPersonControls(GLFWwindow* window, float dt) {
         Camera::fallVelocity = 0;
 
 
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && Camera::fallVelocity <= 0.0f)  // Jump
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && Camera::fallVelocity <= 0.0f && Camera::position.y < constant::CAMERA_MAX_HEIGHT)  // Jump
     { 
         Camera::fallVelocity = gravity;
     }

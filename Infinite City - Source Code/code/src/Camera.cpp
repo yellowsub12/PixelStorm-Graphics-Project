@@ -50,7 +50,6 @@ void Camera::cameraCollisionCheck()
         isColliding = false;
     }
 
-
     /*if (cameraCollisionLocation.x == 0.0f && cameraCollisionLocation.y == -100.0f && cameraCollisionLocation.z == 0.0f)
         cameraPreCollisionPosition = position;
     else

@@ -119,12 +119,12 @@ void InfiniteCity::SpawnRowBlocks(int rowNumber, int direction, int frontColumns
 {
     if (direction == 1)
     {
-        InfinitePathRowFEndNumber = InfinitePathRowFStartNumber + (rand() % (frontColumns + 1));
+        InfinitePathRowFEndNumber = InfinitePathRowFStartNumber + (1+rand() % (frontColumns + 1));
         InfinitePathRowFStartNumber = (-backColumns) + (1 + rand() % (InfinitePathColumnFStartNumber + 1));
     }
     else
     {
-        InfinitePathRowBEndNumber = InfinitePathRowBStartNumber + (rand() % (frontColumns + 1));
+        InfinitePathRowBEndNumber = InfinitePathRowBStartNumber + (1+rand() % (frontColumns + 1));
         InfinitePathRowBStartNumber = (-backColumns) + (1 + rand() % (InfinitePathColumnBStartNumber + 1));
     }
 
@@ -154,12 +154,12 @@ void InfiniteCity::SpawnColumnBlocks(int columnNumber, int direction, int frontR
 {
     if (direction == 1)
     {
-        InfinitePathColumnFEndNumber = InfinitePathColumnFStartNumber + (rand() % (frontRows + 1));
+        InfinitePathColumnFEndNumber = InfinitePathColumnFStartNumber + (1+rand() % (frontRows + 1));
         InfinitePathColumnFStartNumber = (-backRows) + (1 + rand() % (InfinitePathRowFStartNumber + 1));
     }
     else
     {
-        InfinitePathColumnBEndNumber = InfinitePathColumnBStartNumber + (rand() % (frontRows + 1));
+        InfinitePathColumnBEndNumber = InfinitePathColumnBStartNumber + (1+rand() % (frontRows + 1));
         InfinitePathColumnBStartNumber = (-backRows) + (1 + rand() % (InfinitePathRowBStartNumber + 1));
     }
 
