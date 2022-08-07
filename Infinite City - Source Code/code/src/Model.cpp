@@ -243,7 +243,7 @@ void DrawBuilding(vec3 position, float tileSize, GLuint worldMatrixLocation, GLu
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	CollisionCheck(finalPosition, vec3(tileSize, randomFactor * tileSize, tileSize));
+	CollisionCheck(finalPosition, vec3(tileSize, randomFactor * tileSize, tileSize), 0);
 }
 
 void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
@@ -266,7 +266,7 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 	mat4 tileWorldMatrix = translate(mat4(1.0f), finalPosition)
 		* scale(mat4(1.0f), vec3(tileSize * 0.05, (0.1 * (5 + randomFactor))*tileSize, tileSize * 0.05)); //(0.5*(1+randomFactor))+scaleOffset
 
-	CollisionCheck(finalPosition, vec3(tileSize * 0.05, (0.1 * (5 + randomFactor)) * tileSize, tileSize * 0.05));
+	CollisionCheck(finalPosition, vec3(tileSize * 0.05, (0.1 * (5 + randomFactor)) * tileSize, tileSize * 0.05), 0);
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &tileWorldMatrix[0][0]);
 
@@ -328,7 +328,7 @@ void DrawBench(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	CollisionCheck(vec3(position.x, (position.y - 2.0f), position.z), vec3(randomBenchFactor, 4.0, 2.0));
+	CollisionCheck(vec3(position.x, (position.y - 2.0f), position.z), vec3(randomBenchFactor, 4.0, 2.0), 0);
 
 	// Assign texture to the iron
 	glBindTexture(GL_TEXTURE_2D, ironTexture);
@@ -381,7 +381,7 @@ void DrawTrashBin(vec3 position, float tileSize, GLuint worldMatrixLocation, GLu
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	CollisionCheck(vec3(position.x, (position.y), position.z), vec3(1.0, 3.0, 1.0));
+	CollisionCheck(vec3(position.x, (position.y), position.z), vec3(1.0, 3.0, 1.0), 0);
 
 }
 
@@ -476,7 +476,7 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	CollisionCheck(vec3(position.x, position.y, position.z), vec3(0.35, 2.0, 0.35) * 2.5f);
+	CollisionCheck(vec3(position.x, position.y, position.z), vec3(0.35, 2.0, 0.35) * 2.5f, 0);
 
 
 	// Arms 1 Left
@@ -800,7 +800,7 @@ void DrawBus(vec3 position, float tileSize, int orientation, GLuint worldMatrixL
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	
-	CollisionCheck(vec3(position.x - 13.5, position.y, position.z - 6 + zPosOffset), vec3(26, 5, 5));
+	CollisionCheck(vec3(position.x - 13.5, position.y, position.z - 6 + zPosOffset), vec3(26, 5, 5), 0);
 	
 
 }
@@ -822,7 +822,7 @@ void DrawSpaceTower(vec3 position, float tileSize, GLuint worldMatrixLocation, G
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	CollisionCheck(finalPosition, vec3(tileSize / 2, 20.0f * tileSize, tileSize / 2));
+	CollisionCheck(finalPosition, vec3(tileSize / 2, 20.0f * tileSize, tileSize / 2), 0);
 }
 
 
@@ -851,9 +851,9 @@ void DrawCar(vec3 position, float tileSize, int orientation, GLuint worldMatrixL
 	{
 		if (rand() % 1 == 0)
 		{
-			finalPosition.z += 7.5f;
-			
-				
+			finalPosition.z += 7.5f;	
+			carBase = translate(mat4(1.0f), finalPosition)
+				* scale(mat4(1.0f), vec3(tileSize / 4, 2, tileSize / 9));
 		}
 		else
 		{
@@ -886,11 +886,6 @@ void DrawCar(vec3 position, float tileSize, int orientation, GLuint worldMatrixL
 				* scale(mat4(1.0f), vec3(tileSize / 9, 2, tileSize / 4))
 				* rotation;
 		}
-	}
-	else if (orientation == 0)
-	{
-		carBase = translate(mat4(1.0f), finalPosition)
-			* scale(mat4(1.0f), vec3(tileSize / 9, 2, tileSize / 4));
 	}
 	
 
@@ -990,10 +985,10 @@ void DrawCar(vec3 position, float tileSize, int orientation, GLuint worldMatrixL
 
 	vec3 collisionPos = vec3(finalPosition.x, finalPosition.y - 3.0f, finalPosition.z);
 
-	if (orientation == 1)
-		CollisionCheck(collisionPos, vec3(tileSize / 4, 10, tileSize / 9));
+	if (orientation == -1)
+		CollisionCheck(collisionPos, vec3(tileSize / 9, 10, tileSize / 4), worldMatrixLocation);
 	else			   
-		CollisionCheck(collisionPos, vec3(tileSize / 9, 10, tileSize / 4));
+		CollisionCheck(collisionPos, vec3(tileSize / 4, 10, tileSize / 9), worldMatrixLocation);
 }
 
 void DrawLamp(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
@@ -1052,7 +1047,7 @@ void DrawLamp(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 }
 
 
-void CollisionCheck(vec3 position, vec3 scale)
+void CollisionCheck(vec3 position, vec3 scale, GLuint worldMatrixLocation)
 {
 	bool checkX, checkZ, checkY;
 	float collisionOffset = 1.0f;
@@ -1061,6 +1056,11 @@ void CollisionCheck(vec3 position, vec3 scale)
 	checkX = checkVector.x < (position.x + (scale.x) / 2 + collisionOffset) && checkVector.x >(position.x - (scale.x) / 2 - collisionOffset);
 	checkY = checkVector.y < (position.y + (scale.y) / 2 + collisionOffset) && checkVector.y >(position.y - (scale.y) / 2 - collisionOffset);
 	checkZ = checkVector.z < (position.z + (scale.z) / 2 + collisionOffset) && checkVector.z >(position.z - (scale.z) / 2 - collisionOffset);
+
+	//mat4 lampHood = translate(mat4(1.0f), position) * glm::scale(mat4(1.0f), scale);
+	//glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampHood[0][0]);
+
+	//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	if (checkX && checkY && checkZ)
 	{

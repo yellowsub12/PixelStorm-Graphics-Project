@@ -37,7 +37,7 @@ void DrawPhonebooth(vec3 position, float tileSize, GLuint worldMatrixLocation, G
 
 void DrawBus(vec3 position, float tileSize, int orientation, GLuint worldMatrixLocation, GLuint textureLocation);
 
-void CollisionCheck(vec3 objectPosition, vec3 objectScale);
+void CollisionCheck(vec3 objectPosition, vec3 objectScale, GLuint worldMatrixLocation);
 
 void DrawLamp(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
