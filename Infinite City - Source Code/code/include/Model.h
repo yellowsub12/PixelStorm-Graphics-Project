@@ -29,6 +29,12 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 
 void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
+void DrawTrashBin(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
+
+void DrawPhonebooth(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
+
+void DrawBus(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
+
 void DrawLamp(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
 #endif MODEL_H
