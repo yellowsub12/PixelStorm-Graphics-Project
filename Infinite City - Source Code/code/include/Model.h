@@ -31,6 +31,7 @@ void DrawTrashBin(vec3 position, float tileSize, GLuint worldMatrixLocation, GLu
 
 void DrawPhonebooth(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
+void CollisionCheck(vec3 objectPosition, vec3 objectScale);
 
 
 void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation);

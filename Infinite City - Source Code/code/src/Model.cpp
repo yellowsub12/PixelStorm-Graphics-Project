@@ -2,6 +2,8 @@
 #include <iostream>
 #include <textures.h>
 #include <shapes.h>
+#include <Camera.h>
+#include <constants.hpp>
 
 using namespace std;
 
@@ -27,6 +29,55 @@ GLuint phoneboothTexture = 0;
 GLuint upperphoneboothTexture = 0;
 unsigned int humanHeadTexture1;
 
+vec3 playerPosition = vec3(0.0f);
+bool isPlayerColliding = false;
+
+class Cube {
+public:
+	vec3 position;
+	vec3 scale;
+	GLuint cubeModelVAO;
+	vec3 playerCamPosition;
+
+	Cube(vec3 pos, vec3 size, GLuint cubeVAO)
+	{
+		position = pos;
+		scale = size;
+		cubeModelVAO = cubeVAO;
+		playerCamPosition = Camera::position;
+	}
+
+public:
+
+	void Draw(GLuint worldMatrixLocation)
+	{
+		mat4 tileWorldMatrix = translate(mat4(1.0f), position)
+			* glm::scale(mat4(1.0f), scale); //(0.5*(1+randomFactor))+scaleOffset
+
+		glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &tileWorldMatrix[0][0]);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		CollisionCheck();
+	}
+
+	void CollisionCheck()
+	{
+		bool checkX, checkZ, checkY;
+		float collisionOffset = 1.0f;
+		vec3 futureCamPosition = Camera::position + Camera::movementVector;
+		vec3 checkVector = vec3(futureCamPosition.x, futureCamPosition.y-5.0f, futureCamPosition.z);
+		checkX = checkVector.x < (position.x + (scale.x) / 2 + collisionOffset) && checkVector.x >(position.x - (scale.x) / 2 - collisionOffset);
+		checkY = checkVector.y < (position.y + (scale.y) / 2 + collisionOffset) && checkVector.y >(position.y - (scale.y) / 2 - collisionOffset);
+		checkZ = checkVector.z < (position.z + (scale.z) / 2 + collisionOffset) && checkVector.z >(position.z - (scale.z) / 2 - collisionOffset);
+
+		if (checkX && checkY && checkZ)
+		{	
+			Camera::cameraCollisionLocation = position;
+			Camera::isColliding = true;
+		}
+	}
+};
 
 void Initialize()
 {
@@ -125,12 +176,17 @@ void DrawBuilding(vec3 position, float tileSize, GLuint worldMatrixLocation, GLu
 
 	vec3 finalPosition = vec3(position.x, position.y + (0.5 * (1 + randomFactor)) / 2, position.z);
 
-	mat4 tileWorldMatrix = translate(mat4(1.0f), finalPosition)
+	Cube cube(finalPosition, vec3(tileSize, randomFactor * tileSize, tileSize), cubeModelVAO);
+	cube.Draw(worldMatrixLocation);
+
+	/*mat4 tileWorldMatrix = translate(mat4(1.0f), finalPosition)
 		* scale(mat4(1.0f), vec3(tileSize, randomFactor*tileSize, tileSize)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &tileWorldMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	CollisionCheck(finalPosition, vec3(tileSize, randomFactor * tileSize, tileSize));*/
 }
 
 void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
@@ -449,5 +505,3 @@ void DrawSpaceTower(vec3 position, float tileSize, GLuint worldMatrixLocation, G
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
-
-
