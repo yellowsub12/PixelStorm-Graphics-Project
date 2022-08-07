@@ -48,53 +48,6 @@ unsigned int humanHeadTexture1;
 vec3 playerPosition = vec3(0.0f);
 bool isPlayerColliding = false;
 
-class Cube {
-public:
-	vec3 position;
-	vec3 scale;
-	GLuint cubeModelVAO;
-	vec3 playerCamPosition;
-
-	Cube(vec3 pos, vec3 size, GLuint cubeVAO)
-	{
-		position = pos;
-		scale = size;
-		cubeModelVAO = cubeVAO;
-		playerCamPosition = Camera::position;
-	}
-
-public:
-
-	void Draw(GLuint worldMatrixLocation)
-	{
-		mat4 tileWorldMatrix = translate(mat4(1.0f), position)
-			* glm::scale(mat4(1.0f), scale); //(0.5*(1+randomFactor))+scaleOffset
-
-		glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &tileWorldMatrix[0][0]);
-
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		CollisionCheck();
-	}
-
-	void CollisionCheck()
-	{
-		bool checkX, checkZ, checkY;
-		float collisionOffset = 1.0f;
-		vec3 futureCamPosition = Camera::position + Camera::movementVector;
-		vec3 checkVector = vec3(futureCamPosition.x, futureCamPosition.y-5.0f, futureCamPosition.z);
-		checkX = checkVector.x < (position.x + (scale.x) / 2 + collisionOffset) && checkVector.x >(position.x - (scale.x) / 2 - collisionOffset);
-		checkY = checkVector.y < (position.y + (scale.y) / 2 + collisionOffset) && checkVector.y >(position.y - (scale.y) / 2 - collisionOffset);
-		checkZ = checkVector.z < (position.z + (scale.z) / 2 + collisionOffset) && checkVector.z >(position.z - (scale.z) / 2 - collisionOffset);
-
-		if (checkX && checkY && checkZ)
-		{	
-			Camera::cameraCollisionLocation = position;
-			Camera::isColliding = true;
-		}
-	}
-};
-
 void Initialize()
 {
 	vector<std::string> humanHead1{
@@ -147,7 +100,7 @@ void Initialize()
 
 }
 
-void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocation, GLuint textureLocation, GLuint shaderProgram)
+void Draw(vec3 position, float tileSize, int blockType, bool roadTile, int orientation, GLuint worldMatrixLocation, GLuint textureLocation, GLuint shaderProgram)
 {
 	if (blockType == 5)
 	{
@@ -175,19 +128,68 @@ void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocati
 	else 
 	{
 		int random_integer;
-		int lowest = 1, highest = 3;
+		int lowest = 1, highest = 2;
 		int range = (highest - lowest) + 1;
 		random_integer = lowest + rand() % range;
-		if (random_integer == 1) {
-			DrawBus(position, tileSize, worldMatrixLocation, textureLocation);
-		}
-		if (random_integer == 2)
+		if (roadTile)
 		{
-			DrawBuilding(position, tileSize, worldMatrixLocation, textureLocation);
+			if (random_integer == 1) {
+				int r2 = rand() % 4;
+				//if(r2 == 3)
+					//DrawBus(position, tileSize, orientation, worldMatrixLocation, textureLocation);
+			}
+			if (random_integer == 2)
+			{
+				int r2 = rand() % 4;
+				//if (r2 == 3)
+					//DrawCar(position, tileSize, orientation, worldMatrixLocation, textureLocation);
+			}
 		}
-		if (random_integer == 3)
+		else
 		{
-			DrawTree(position, tileSize, worldMatrixLocation, textureLocation);
+			if (rand() % 5 <= 2)
+				DrawTile(position, tileSize, blockType, worldMatrixLocation, textureLocation, shaderProgram);
+			else
+				DrawBuilding(position, tileSize, worldMatrixLocation, textureLocation);
+		}
+		
+	}
+}
+
+void DrawTile(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocation, GLuint textureLocation, GLuint shaderProgram)
+{
+	glBindVertexArray(planeVAO);
+	if(rand()%1 == 0)
+		glBindTexture(GL_TEXTURE_2D, soilTexture);
+	else
+		glBindTexture(GL_TEXTURE_2D, leavesTexture);
+
+	mat4 soilWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + 0.05), position.z))
+		* scale(mat4(1.0f), vec3(tileSize, 0.525, tileSize)); //(0.5*(1+randomFactor))+scaleOffset
+
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &soilWorldMatrix[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glBindVertexArray(cubeModelVAO);
+
+	for (int i = -1; i <= 1; i++)
+	{
+		for (int j = -1; j <= 1; j++)
+		{
+			
+			vec3 finalPosition = vec3(position.x + i*(5+rand()%5), position.y, position.z + j * (5 + rand() % 5));
+			int randomFactor = rand() % 3;
+		
+				if (randomFactor == 0)
+					DrawHuman(finalPosition, tileSize, worldMatrixLocation, textureLocation, shaderProgram);
+				else if (randomFactor == 1)
+					DrawTrashBin(finalPosition, tileSize, worldMatrixLocation, textureLocation);
+				else if (randomFactor == 2)
+					DrawBench(finalPosition, tileSize, worldMatrixLocation, textureLocation);
+				else if (randomFactor == 3)
+					DrawTree(finalPosition, tileSize, worldMatrixLocation, textureLocation);		
+
 		}
 	}
 }
@@ -209,17 +211,14 @@ void DrawBuilding(vec3 position, float tileSize, GLuint worldMatrixLocation, GLu
 
 	vec3 finalPosition = vec3(position.x, position.y + (0.5 * (1 + randomFactor)) / 2, position.z);
 
-	Cube cube(finalPosition, vec3(tileSize, randomFactor * tileSize, tileSize), cubeModelVAO);
-	cube.Draw(worldMatrixLocation);
-
-	/*mat4 tileWorldMatrix = translate(mat4(1.0f), finalPosition)
+	mat4 tileWorldMatrix = translate(mat4(1.0f), finalPosition)
 		* scale(mat4(1.0f), vec3(tileSize, randomFactor*tileSize, tileSize)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &tileWorldMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	CollisionCheck(finalPosition, vec3(tileSize, randomFactor * tileSize, tileSize));*/
+	CollisionCheck(finalPosition, vec3(tileSize, randomFactor * tileSize, tileSize));
 }
 
 void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
@@ -550,15 +549,12 @@ void DrawBus(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint t
 	glBindTexture(GL_TEXTURE_2D, busfrontTexture);
 	glUniform1i(textureLocation, 1);
 
-
-
 	mat4 frontBodyMatrix = initialPosition * translate(mat4(1.0f), vec3(position.x, position.y + 2.3, position.z -6 )) * initialRotation * rotate(mat4(1.0f), 3.14159f, vec3(1.0f, 0.0f, 0.0f))
 		* scale(mat4(1.0f), vec3(4, 4, 0.1)) * initialScale; //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &frontBodyMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-
 
 	// Back 
 	glBindTexture(GL_TEXTURE_2D, busbackTexture);
@@ -741,6 +737,8 @@ void DrawBus(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint t
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
+	CollisionCheck(finalPosition, vec3(4, 4, 13.1));
+
 }
 
 void DrawSpaceTower(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
@@ -759,11 +757,14 @@ void DrawSpaceTower(vec3 position, float tileSize, GLuint worldMatrixLocation, G
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &tileWorldMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	CollisionCheck(finalPosition, vec3(tileSize / 2, 20.0f * tileSize, tileSize / 2));
 }
 
 
-void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
+void DrawCar(vec3 position, float tileSize, int orientation, GLuint worldMatrixLocation, GLuint textureLocation)
 {
+
 	int probabilityCheck = rand() % 100; // Variable to help us adjust what numbers spawn more often and what numbers spawn less often. 
 	int randomFactor = 0; // The random factor which affects the scale of the building.// = rand() % 11; 
 	if (probabilityCheck < 2) randomFactor = 9; // less than 2% of buildings will be 15 units tall
@@ -777,11 +778,58 @@ void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint t
 	glBindTexture(GL_TEXTURE_2D, redTexture);
 	glUniform1i(textureLocation, 1);
 
-	vec3 finalPosition = vec3(position.x, position.y + (0.1 * (1 + randomFactor)) / 2, position.z);
+	vec3 finalPosition = vec3(position.x, position.y + (1.0f), position.z);
+
+	mat4 carBase;
 
 	//Car Base
-	mat4 carBase = translate(mat4(1.0f), finalPosition) 
-		* scale(mat4(1.0f), vec3(tileSize / 2, 0.25f, tileSize / 3));
+	if (orientation == 1)
+	{
+		if (rand() % 1 == 0)
+		{
+			finalPosition.z += 7.5f;
+			
+				
+		}
+		else
+		{
+			finalPosition.z -= 7.5f;
+			mat4 rotation = rotate(mat4(1.0f), -3.14159f, vec3(0.0f, 1.0f, 0.0f));
+
+			carBase = translate(mat4(1.0f), finalPosition)
+				* scale(mat4(1.0f), vec3(tileSize / 4, 2, tileSize / 9))
+				* rotation;
+		}	
+		
+	}
+	else if (orientation == -1)
+	{
+		if (rand() % 1 == 0)
+		{
+			finalPosition.x += 7.5f;
+			mat4 rotation = rotate(mat4(1.0f), 1.5708f, vec3(0.0f, 1.0f, 0.0f));
+
+			carBase = translate(mat4(1.0f), finalPosition)
+				* scale(mat4(1.0f), vec3(tileSize / 9, 2, tileSize / 4))
+				* rotation;
+		}
+		else
+		{
+			finalPosition.x -= 7.5f;
+			mat4 rotation = rotate(mat4(1.0f), -1.5708f, vec3(0.0f, 1.0f, 0.0f));
+
+			carBase = translate(mat4(1.0f), finalPosition)
+				* scale(mat4(1.0f), vec3(tileSize / 9, 2, tileSize / 4))
+				* rotation;
+		}
+	}
+	else if (orientation == 0)
+	{
+		carBase = translate(mat4(1.0f), finalPosition)
+			* scale(mat4(1.0f), vec3(tileSize / 9, 2, tileSize / 4));
+	}
+	
+
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &carBase[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
@@ -797,19 +845,19 @@ void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint t
 	glBindTexture(GL_TEXTURE_2D, whiteTexture);
 
 	//Wheel rim front
-	mat4 wheels = carBase * translate(mat4(1.0f), vec3(0.35f, 0.06f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.12f));
+	mat4 wheels = carBase * translate(mat4(1.0f), vec3(0.35f, -0.40f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.12f));
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
 
 	//Wheel rim back
-	wheels = carBase * translate(mat4(1.0f), vec3(-0.35f, 0.06f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.12f));
+	wheels = carBase * translate(mat4(1.0f), vec3(-0.35f, -0.40f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.12f));
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
 
 	//Mirrors
-	wheels = carBase * translate(mat4(1.0f), vec3(0.1f, 0.22f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.2f));
+	wheels = carBase * translate(mat4(1.0f), vec3(0.1f, 0.25f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.2f));
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
@@ -851,13 +899,13 @@ void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint t
 	glBindTexture(GL_TEXTURE_2D, tireTexture);
 
 	//Wheel front
-	 wheels = carBase * translate(mat4(1.0f), vec3(0.35f, -0.05f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.0f, 1.1f));
+	 wheels = carBase * translate(mat4(1.0f), vec3(0.35f, -0.45f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.0f, 1.1f));
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
 
 	//Wheel back
-	wheels = carBase * translate(mat4(1.0f), vec3(-0.35f, -0.05f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.0f, 1.1f));
+	wheels = carBase * translate(mat4(1.0f), vec3(-0.35f, -0.45f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.0f, 1.1f));
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
@@ -930,3 +978,20 @@ void DrawLamp(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 
 }
 
+
+void CollisionCheck(vec3 position, vec3 scale)
+{
+	bool checkX, checkZ, checkY;
+	float collisionOffset = 1.0f;
+	vec3 futureCamPosition = Camera::position + Camera::movementVector;
+	vec3 checkVector = vec3(futureCamPosition.x, futureCamPosition.y - 5.0f, futureCamPosition.z);
+	checkX = checkVector.x < (position.x + (scale.x) / 2 + collisionOffset) && checkVector.x >(position.x - (scale.x) / 2 - collisionOffset);
+	checkY = checkVector.y < (position.y + (scale.y) / 2 + collisionOffset) && checkVector.y >(position.y - (scale.y) / 2 - collisionOffset);
+	checkZ = checkVector.z < (position.z + (scale.z) / 2 + collisionOffset) && checkVector.z >(position.z - (scale.z) / 2 - collisionOffset);
+
+	if (checkX && checkY && checkZ)
+	{
+		Camera::cameraCollisionLocation = position;
+		Camera::isColliding = true;
+	}
+}

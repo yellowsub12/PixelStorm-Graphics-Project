@@ -5,7 +5,7 @@
 #include <iostream>
 #include <constants.hpp>
 
-vec3 Camera::position = vec3(30.0f, 3.5f, 0.0f);
+vec3 Camera::position = vec3(0.0f, 3.5f, 30.0f);
 vec3 Camera::movementVector = vec3(0.0f);
 vec3 Camera::lookAt = vec3(0.0f);
 float Camera::fov = 70.0f;

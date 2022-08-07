@@ -19,7 +19,7 @@ void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation
 {
     if (blockType == 5) // Draw the Space Tower in the center of the world (0, 0, 0)
     {
-        Draw(blockLocation, blockSize, blockType, worldMatrixLocation, textureLocation, shaderProgram);
+        Draw(blockLocation, blockSize, blockType, false, 0, worldMatrixLocation, textureLocation, shaderProgram);
         return; 
     }
     // This is a work in progress method for drawing objects on each tile. (Sam and Ali can take a look at it)
@@ -29,40 +29,47 @@ void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation
     srand(blockSeed + (blockLocation.x * blockLocation.z * 100)); 
 
     float tileSize = blockSize/3; // horizontal size of each building
-    
+
+    bool isRoadTile = false; //Boolean variable to help differentiate between road tiles and non-road tiles
+    int orientation = 0;
     // Nested for loop to generate the buildings on the block in the format of a 3x3 board.
     // This for loop works by considering each block as a 2d square grid in the format of 3x3, 4x4, etc. 
     for (int i = -numOfTileRows/2; i <= numOfTileRows/2; i++)
     {
         for (int j = -numOfTileRows/2; j <= numOfTileRows/2; j++)
         {
+            isRoadTile = false;
+            orientation = 0;
             //if (rand() % 11 > 5) continue;
            
             // The following if-statements will ensure that no building is actually placed on the roads. 
             // Buildings will only be placed on the part of the block that has no road and only has empty dark gray space. 
             if (blockType == 0)
             {
-                if (i == 0) continue;
+                if (i == 0) isRoadTile = true;
+                orientation = -1;
             }
-            else if (blockType == 1)
+            if (blockType == 1)
             {
-                if (j == 0)
+                if (i == 0 && j == 0) { isRoadTile = true; orientation = 1; }
+                if (i == 1 && j == 0) { isRoadTile = true; orientation = -1;  }
+                if (i == 0 && j == 1) { isRoadTile = true; orientation = -1; }
+            }
+            if (blockType == 2)
+            {
+                if (i == 0 || j == 0)
                 {
-                    if (i == 0 || i == 1)
-                    {
-                        continue;
-                    }
+                    isRoadTile = true;
+                    if (i == 0 && (j == 1 || j == -1)) orientation = -1;
+                    else if(j==0 && (i == 1 || i == -1)) orientation = 1;
                 }
-                if (i == 0 && j == 1) continue;
             }
-            else if (blockType == 2)
+            if (blockType == 3)
             {
-                if (i == 0 || j == 0) continue;          
-            }
-            else if (blockType == 3)
-            {
-                if (j == 0) continue;
-                if (j == 1 && i == 0) continue;
+                if (j == 0) { isRoadTile = true; orientation = 1; }
+                if (j == 1 && i == 0) { isRoadTile = true; orientation = -1; }
+
+                if (i == 0 && j == 0) orientation = 0;
             }
 
             // Adjusting the probability of getting certain numbers from the random generator
@@ -81,15 +88,7 @@ void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation
                blockLocation.y,
                blockLocation.z + j * (blockSize/3));
 
-            Draw(position, tileSize+1, blockType, worldMatrixLocation, textureLocation, shaderProgram);
-
-            //Assigning the world matrix for this tile using the calculated location above. 
-            /*mat4 tileWorldMatrix = translate(mat4(1.0f), position)
-                * scale(mat4(1.0f), vec3(tileSize+(1.0f/numOfTileRows), 0.5, tileSize+(1.0f/numOfTileRows))); //(0.5*(1+randomFactor))+scaleOffset
-
-            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &tileWorldMatrix[0][0]);
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);*/
+            Draw(position, tileSize+1, blockType, isRoadTile, orientation, worldMatrixLocation, textureLocation, shaderProgram);
         }
     }
 }
