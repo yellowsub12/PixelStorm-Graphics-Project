@@ -119,13 +119,13 @@ void InfiniteCity::SpawnRowBlocks(int rowNumber, int direction, int frontColumns
 {
     if (direction == 1)
     {
-        InfinitePathRowFEndNumber = InfinitePathRowFStartNumber + (rand() % (frontColumns + 1));
-        InfinitePathRowFStartNumber = (-backColumns) + (rand() % (InfinitePathColumnFStartNumber + 1));
+        InfinitePathRowFEndNumber = InfinitePathRowFStartNumber + (1+rand() % (frontColumns + 1));
+        InfinitePathRowFStartNumber = (-backColumns) + (1 + rand() % (InfinitePathColumnFStartNumber + 1));
     }
     else
     {
-        InfinitePathRowBEndNumber = InfinitePathRowBStartNumber + (rand() % (frontColumns + 1));
-        InfinitePathRowBStartNumber = (-backColumns) + (rand() % (InfinitePathColumnBStartNumber + 1));
+        InfinitePathRowBEndNumber = InfinitePathRowBStartNumber + (1+rand() % (frontColumns + 1));
+        InfinitePathRowBStartNumber = (-backColumns) + (1 + rand() % (InfinitePathColumnBStartNumber + 1));
     }
 
     for (int i = -backColumns; i < (frontColumns+1); i++)
@@ -154,13 +154,13 @@ void InfiniteCity::SpawnColumnBlocks(int columnNumber, int direction, int frontR
 {
     if (direction == 1)
     {
-        InfinitePathColumnFEndNumber = InfinitePathColumnFStartNumber + (rand() % (frontRows + 1));
-        InfinitePathColumnFStartNumber = (-backRows) + (rand() % (InfinitePathRowFStartNumber + 1));
+        InfinitePathColumnFEndNumber = InfinitePathColumnFStartNumber + (1+rand() % (frontRows + 1));
+        InfinitePathColumnFStartNumber = (-backRows) + (1 + rand() % (InfinitePathRowFStartNumber + 1));
     }
     else
     {
-        InfinitePathColumnBEndNumber = InfinitePathColumnBStartNumber + (rand() % (frontRows + 1));
-        InfinitePathColumnBStartNumber = (-backRows) + (rand() % (InfinitePathRowBStartNumber + 1));
+        InfinitePathColumnBEndNumber = InfinitePathColumnBStartNumber + (1+rand() % (frontRows + 1));
+        InfinitePathColumnBStartNumber = (-backRows) + (1 + rand() % (InfinitePathRowBStartNumber + 1));
     }
 
     for (int i = -backRows; i < (frontRows+1); i++)
@@ -315,14 +315,14 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
 
         // light parameters
-        vec3 lightPosition = vec3(-100.0f * (dayNightCycleTime * sinf((currentTime * 0.1) + PI / 2)),
-            100.0f*(dayNightCycleTime * sinf(currentTime * 0.1)), 
-            0.0f); // the location of the light in 3D space, variable
-        //vec3 lightPosition = vec3(20.0f, 20.0f, 20.0f);
+        //vec3 lightPosition = vec3(-100.0f * (dayNightCycleTime * sinf((currentTime * 0.1) + PI / 2)),
+        //    100.0f*(dayNightCycleTime * sinf(currentTime * 0.1)), 
+        //    0.0f); // the location of the light in 3D space, variable
+        vec3 lightPosition = vec3(20.0f, 20.0f, 20.0f);
         vec3 lightFocus = vec3(0.0f, 0.0f, 1.0f);      // the point in 3D space the light "looks" at
         vec3 lightDirection = normalize(lightFocus - lightPosition);
 
-        float lightNearPlane = 1.0f;
+        float lightNearPlane = 0.01f;
         float lightFarPlane = 8000.0f;
 
         //Setting up the light projection matrix
@@ -457,7 +457,11 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         GLuint textureLocation = glGetUniformLocation(sceneShaderProgram, "shadow_map");
         glBindTexture(GL_TEXTURE_2D, depth_map_texture);
         glUniform1i(textureLocation, 0);
+        glActiveTexture(GL_TEXTURE0 + 1);
         GLuint textureLocation1 = glGetUniformLocation(sceneShaderProgram, "actualTexture");
+        glBindTexture(GL_TEXTURE_2D, testTexture);
+        glUniform1i(textureLocation, 1);
+        
 
         // Iterator to iterate through the totalBlocks array (array that contains all block of the city) and draw them one by one. 
         for (auto block : totalBlocks)
@@ -471,7 +475,15 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
             if (distanceFromCamera < 500.0f)
             {
                 glBindVertexArray(planeVAO);
+                
+       
+                if(block.blockLocation.x == 0 && block.blockLocation.z == 0)
+                    glUniform1i(glGetUniformLocation(sceneShaderProgram, "affectedByLighting"), false);
+                    
                 block.DrawBlock(sceneShaderProgram, worldMatrixLocation1, actualTextureLocation);
+
+                if (block.blockLocation.x == 0 && block.blockLocation.z == 0)
+                    glUniform1i(glGetUniformLocation(sceneShaderProgram, "affectedByLighting"), true);
             }
         }
 
@@ -550,6 +562,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
         glfwSwapBuffers(window);
         glfwPollEvents();           
 
+        
         Controls::globalControls(window);
         Controls::firstPersonControls(window, dt);
         mainCamera.updateCamera(viewMatrixLocation, projectionMatrixLocation, window);

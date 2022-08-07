@@ -26,7 +26,7 @@ public:
 	CityBlock(int type, int size, int numTilesRows, vec3 location, GLuint texture, int seed);
 
 	// Generates the actual elements on each block such as buildings, trees, etc
-	void GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation);
+	void GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation, GLuint shaderProgram);
 
 	// Draw this block in the world
 	void DrawBlock(GLuint shaderProgram, GLuint worldMatrixLocation, GLuint textureLocation);

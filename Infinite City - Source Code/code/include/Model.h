@@ -15,7 +15,7 @@ using namespace glm;
 
 void Initialize();
 
-void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLoction, GLuint textureLocation);
+void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLoction, GLuint textureLocation, GLuint shaderProgram);
 
 void DrawBuilding(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
@@ -25,7 +25,7 @@ void DrawSpaceTower(vec3 position, float tileSize, GLuint worldMatrixLocation, G
 
 void DrawBench(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
-void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
+void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation, GLuint shaderProgram);
 
 void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
@@ -34,6 +34,8 @@ void DrawTrashBin(vec3 position, float tileSize, GLuint worldMatrixLocation, GLu
 void DrawPhonebooth(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 
 void DrawBus(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
+
+void CollisionCheck(vec3 objectPosition, vec3 objectScale);
 
 void DrawLamp(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 

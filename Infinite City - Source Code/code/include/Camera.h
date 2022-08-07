@@ -15,6 +15,7 @@ using namespace glm;
 class Camera {
 public:
 	static vec3 position;
+	static vec3 movementVector;
 	static vec3 lookAt;
 	static float fov;
 	static vec3 cameraUp;
@@ -23,6 +24,11 @@ public:
 	static float cameraVerticalLimits;
 	static float cameraHorizontalAngle;
 	static float cameraVerticalAngle;
+	static vec3 cameraPreCollisionPosition;
+	static vec3 cameraCollisionLocation;
+	static float collisionObjectYScale;
+	static float fallVelocity;
+	static bool isColliding;
 
 	Camera(); // Default Construtor
 	Camera(Camera &copyCam); // Copy Constructor 
@@ -33,5 +39,6 @@ public:
 	void setCameraHorizontalAngle(float cameraHorizontalAngle);
 	void setCameraVerticleAngle(float cameraVerticleAngle);
 	void updateCamera(GLuint viewMatrixLocation, GLuint projMatrixLocation, GLFWwindow* currentWindow);
+	void cameraCollisionCheck();
 };
 

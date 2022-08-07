@@ -15,11 +15,11 @@ CityBlock::CityBlock(int type, int size, int numTilesRows, vec3 location, GLuint
     blockType = type;
 }
 
-void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation)
+void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation, GLuint shaderProgram)
 {
     if (blockType == 5) // Draw the Space Tower in the center of the world (0, 0, 0)
     {
-        Draw(blockLocation, blockSize, blockType, worldMatrixLocation, textureLocation);
+        Draw(blockLocation, blockSize, blockType, worldMatrixLocation, textureLocation, shaderProgram);
         return; 
     }
     // This is a work in progress method for drawing objects on each tile. (Sam and Ali can take a look at it)
@@ -81,7 +81,7 @@ void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation
                blockLocation.y,
                blockLocation.z + j * (blockSize/3));
 
-            Draw(position, tileSize+1, blockType, worldMatrixLocation, textureLocation);
+            Draw(position, tileSize+1, blockType, worldMatrixLocation, textureLocation, shaderProgram);
 
             //Assigning the world matrix for this tile using the calculated location above. 
             /*mat4 tileWorldMatrix = translate(mat4(1.0f), position)
@@ -109,5 +109,5 @@ void CityBlock::DrawBlock(GLuint shaderProgram, GLuint worldMatrixLocation, GLui
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Call the method that will populate this block with stuff on it, such as buildings, tree, cars, etc (in progress)
-    GenerateTiles(worldMatrixLocation, textureLocation);
+    GenerateTiles(worldMatrixLocation, textureLocation, shaderProgram);
 }
