@@ -55,8 +55,6 @@ vec3 specular_color(vec3 light_color_arg, vec3 light_position_arg) {
 }
 
 float shadow_scalar() {
-    // this function returns 1.0 when the surface receives light, and 0.0 when it is in a shadow
-    // perform perspective divide
     vec3 normalized_device_coordinates = fragmentPositionLightSpace.xyz / fragmentPositionLightSpace.w;
     // transform to [0,1] range
     normalized_device_coordinates = normalized_device_coordinates * 0.5 + 0.5;
@@ -65,8 +63,25 @@ float shadow_scalar() {
     // get depth of current fragment from light's perspective
     float current_depth = normalized_device_coordinates.z;
     // check whether current frag pos is in shadow
-    float bias = 0.0000;
-    return ((current_depth - bias) < closest_depth) ? 1.0 : 0.0;
+    float bias = max(0.05 * (1.0 - dot(fragmentNormal, lightDirection)), 0.005);
+    float shadow = 0.0;
+    vec2 texel_size = 1.0 / textureSize(shadow_map, 0);
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float pcf_depth = texture(shadow_map, normalized_device_coordinates.xy + vec2(x, y) * texel_size).r;
+            shadow += current_depth - bias > pcf_depth ? 1.0 : 0.0;
+        }
+    }
+    shadow /= 9.0;
+
+    if(normalized_device_coordinates.z > 1.0)
+    {
+        shadow = 0.0;
+    }
+    
+    return shadow;
 }
 
 float spotlight_scalar() {
@@ -88,7 +103,7 @@ void main()
 		vec3 diffuse = vec3(0.0f);
 		vec3 specular = vec3(0.0f);
 	
-		float scalar = spotlight_scalar() * shadow_scalar();
+		float scalar = 1.0f;//spotlight_scalar() * shadow_scalar();
 		
 		ambient = ambient_color(lightColor);
 		diffuse = scalar * diffuse_color(lightColor, lightPosition);

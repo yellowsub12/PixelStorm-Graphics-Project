@@ -341,10 +341,10 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
 
         // light parameters
-        //vec3 lightPosition = vec3(-100.0f * (dayNightCycleTime * sinf((currentTime * 0.1) + PI / 2)),
-        //    100.0f*(dayNightCycleTime * sinf(currentTime * 0.1)), 
-        //    0.0f); // the location of the light in 3D space, variable
-        vec3 lightPosition = vec3(20.0f, 20.0f, 20.0f);
+        vec3 lightPosition = vec3(-100.0f * (dayNightCycleTime * sinf((currentTime * 0.1) + PI / 2)),
+            100.0f*(dayNightCycleTime * sinf(currentTime * 0.1)), 
+            0.0f); // the location of the light in 3D space, variable
+        //vec3 lightPosition = vec3(20.0f, 20.0f, 20.0f);
         vec3 lightFocus = vec3(0.0f, 0.0f, 1.0f);      // the point in 3D space the light "looks" at
         vec3 lightDirection = normalize(lightFocus - lightPosition);
 
@@ -365,6 +365,7 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
         // Set light color on scene and textured shaders
         glUniform3fv(glGetUniformLocation(sceneShaderProgram, "lightColor"), 1, value_ptr(vec3(1.0f, 1.0f, 1.0f)));
+        glUniform3fv(glGetUniformLocation(sceneShaderProgram, "view_position"), 1, value_ptr(Camera::position));
 
 
         glUniformMatrix4fv(glGetUniformLocation(sceneShaderProgram, "lightViewProjMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
@@ -433,20 +434,21 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
 
         }
 
-        for (auto block: totalBlocks)
+        /*for (auto block : totalBlocks)
         {
             // Variables to calculate distance and dot product between the camera and the individual blocks
             vec3 cameraToBlock = block.blockLocation - mainCamera.position;
             float distanceFromCamera = length(vec3(cameraToBlock.x, 0.0f, cameraToBlock.z));
+            float dotproduct = dot(normalize(cameraToBlock), normalize(Camera::lookAt));
 
             // Render the the block only if its is within view (dotproduct) or if it is within 50.0f units from the camera
             // However, if the block is within 10.0f units from the camera, it will render no matter what. 
-            if (distanceFromCamera < 500.0f)
+            if ((distanceFromCamera < 400.0f && dotproduct > 0.4) || distanceFromCamera < 100.0f)
             {
                 glBindVertexArray(planeVAO);
                 block.DrawBlock(shadowShaderProgram, worldMatrixLocation2, actualTextureLocation);
             }
-        }
+        }*/
 
 
         // |---------------------------------------------------------------------------------------------------------------------------|
@@ -495,21 +497,30 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
             // Variables to calculate distance and dot product between the camera and the individual blocks
             vec3 cameraToBlock = block.blockLocation - mainCamera.position;
             float distanceFromCamera = length(vec3(cameraToBlock.x, 0.0f, cameraToBlock.z));
+            float dotproduct = dot(normalize(cameraToBlock), normalize(Camera::lookAt));
 
             // Render the the block only if its is within view (dotproduct) or if it is within 50.0f units from the camera
             // However, if the block is within 10.0f units from the camera, it will render no matter what. 
-            if (distanceFromCamera < 500.0f)
+            if ((distanceFromCamera < 400.0f && dotproduct > 0.3) || distanceFromCamera < 100.0f)
             {
                 glBindVertexArray(planeVAO);
                 
        
-                if(block.blockLocation.x == 0 && block.blockLocation.z == 0)
+                if (block.blockLocation.x == 0 && block.blockLocation.z == 0)
+                {
                     glUniform1i(glGetUniformLocation(sceneShaderProgram, "affectedByLighting"), false);
+                    glUniform1i(glGetUniformLocation(sceneShaderProgram, "uvMultiplier"), 1.0f);
+                }
+                    
                     
                 block.DrawBlock(sceneShaderProgram, worldMatrixLocation1, actualTextureLocation);
 
                 if (block.blockLocation.x == 0 && block.blockLocation.z == 0)
+                {
                     glUniform1i(glGetUniformLocation(sceneShaderProgram, "affectedByLighting"), true);
+                    glUniform1i(glGetUniformLocation(sceneShaderProgram, "uvMultiplier"), 1);
+                }
+                   
             }
         }
 

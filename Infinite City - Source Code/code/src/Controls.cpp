@@ -121,12 +121,17 @@ void Controls::firstPersonControls(GLFWwindow* window, float dt) {
         Camera::position.x += finalMovementVector.x;
         Camera::position.z += finalMovementVector.z;
     }
+    else if (Camera::position.y > Camera::cameraCollisionLocation.y + Camera::cameraCollisionScale.y + constant::CAMERA_MIN_HEIGHT)
+    {
+        Camera::position.x += finalMovementVector.x;
+        Camera::position.z += finalMovementVector.z;
+    }
 
     if (Camera::position.y >= constant::CAMERA_MIN_HEIGHT)
     {
         if (Camera::isColliding)
         {
-            Camera::fallVelocity = 0.1f;
+            Camera::fallVelocity = 0.0f;
         }
         else
             Camera::fallVelocity -= gravity * dt;
@@ -141,7 +146,9 @@ void Controls::firstPersonControls(GLFWwindow* window, float dt) {
         Camera::fallVelocity = gravity;
     }
 
-    Camera::position.y += Camera::fallVelocity;
+    if(!Camera::isColliding)
+        Camera::position.y += Camera::fallVelocity;
+
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) { //sprint
         Camera::position.y = std::max(constant::CAMERA_MIN_HEIGHT, Camera::position.y - Camera::cameraSpeed * dt);

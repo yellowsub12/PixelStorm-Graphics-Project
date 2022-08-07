@@ -62,9 +62,14 @@ int main(int argc, char* argv[])
     int cityStartingWidth = 5;  // How many blocks wide is the city at the start of the program (before the city grows as we move around)?
     int blockSize = 100; // Size of each block in the city, a block will contain elements on it such as buildings, parks, trees, etc. A building block of the city. 
 
-    cout << "Current Seed: " << constant::PROCEDURAL_SEED << endl; // print seed
+    srand(time(0));
+    long randomSeed = rand() % RAND_MAX;
 
-    InfiniteCity city(cityStartingWidth, cityStartingLength, blockSize, (int)constant::PROCEDURAL_SEED); // Creating a new City object that will hold every single element and function of the city
+    cout << "Current Seed: " << randomSeed << endl; // print seed
+
+    srand(randomSeed);
+
+    InfiniteCity city(cityStartingWidth, cityStartingLength, blockSize, (int)randomSeed); // Creating a new City object that will hold every single element and function of the city
 
     // Creating simple string variables to hold the path strings for the folders that contain the shaders and textures
     string shaderPathPrefix = "assets/shaders/"; 

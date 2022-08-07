@@ -62,6 +62,7 @@ void CityBlock::GenerateTiles(GLuint worldMatrixLocation, GLuint textureLocation
                     isRoadTile = true;
                     if (i == 0 && (j == 1 || j == -1)) orientation = -1;
                     else if(j==0 && (i == 1 || i == -1)) orientation = 1;
+                    if (i == 0 && j == 0) orientation = 0;
                 }
             }
             if (blockType == 3)

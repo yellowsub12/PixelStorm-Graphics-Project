@@ -26,6 +26,7 @@ public:
 	static float cameraVerticalAngle;
 	static vec3 cameraPreCollisionPosition;
 	static vec3 cameraCollisionLocation;
+	static vec3 cameraCollisionScale;
 	static float collisionObjectYScale;
 	static float fallVelocity;
 	static bool isColliding;

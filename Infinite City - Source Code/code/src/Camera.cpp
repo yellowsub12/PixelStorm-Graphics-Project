@@ -5,7 +5,7 @@
 #include <iostream>
 #include <constants.hpp>
 
-vec3 Camera::position = vec3(0.0f, 3.5f, 30.0f);
+vec3 Camera::position = vec3(30.0f, 3.5f, 00.0f);
 vec3 Camera::movementVector = vec3(0.0f);
 vec3 Camera::lookAt = vec3(0.0f);
 float Camera::fov = 70.0f;
@@ -16,6 +16,7 @@ float Camera::cameraVerticalLimits = 89.0f;
 float Camera::cameraHorizontalAngle = 0.0f;
 float Camera::cameraVerticalAngle = 0.0f;
 vec3 Camera::cameraCollisionLocation = vec3(0.0f, -100.0f, 0.0f);
+vec3 Camera::cameraCollisionScale = vec3(0.0f);
 float Camera::collisionObjectYScale = 0.0f;
 vec3 Camera::cameraPreCollisionPosition = position;
 float Camera::fallVelocity = 0.1f;
