@@ -20,6 +20,12 @@ GLuint ironTexture = 0;
 GLuint fabricsTexture = 0;
 GLuint fabricsarmsTexture = 0;
 GLuint jeanslegTexture = 0;
+GLuint redTexture = 0;
+GLuint blackTexture = 0;
+GLuint whiteTexture = 0;
+GLuint headlightTexture = 0;
+GLuint glassTexture = 0;
+GLuint tireTexture = 0;
 GLuint frontTexture = 0;
 GLuint trashTexture = 0;
 GLuint trashbinTexture = 0;
@@ -35,7 +41,6 @@ GLuint wheelTexture = 0;
 GLuint rimTexture = 0;
 GLuint antennaTexture = 0;
 GLuint antenna2Texture = 0;
-
 
 
 void Initialize()
@@ -70,6 +75,12 @@ void Initialize()
 
 
 	towerTexture = loadTexture((texturesPathPrefix + "SpaceTower.jpg").c_str());
+	redTexture = loadTexture((texturesPathPrefix + "red.jpg").c_str());
+	blackTexture = loadTexture((texturesPathPrefix + "black.jpg").c_str());
+	whiteTexture = loadTexture((texturesPathPrefix + "white.jpg").c_str());
+	headlightTexture = loadTexture((texturesPathPrefix + "headlight.jpg").c_str());
+	glassTexture = loadTexture((texturesPathPrefix + "glass.jpg").c_str());
+	tireTexture = loadTexture((texturesPathPrefix + "tire.jpg").c_str());
 
 }
 
@@ -652,9 +663,6 @@ void DrawBus(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint t
 
 }
 
-
-
-
 void DrawSpaceTower(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
 {
 	glBindVertexArray(cubeModelVAO);
@@ -674,3 +682,170 @@ void DrawSpaceTower(vec3 position, float tileSize, GLuint worldMatrixLocation, G
 }
 
 
+void DrawCar(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
+{
+	int probabilityCheck = rand() % 100; // Variable to help us adjust what numbers spawn more often and what numbers spawn less often. 
+	int randomFactor = 0; // The random factor which affects the scale of the building.// = rand() % 11; 
+	if (probabilityCheck < 2) randomFactor = 9; // less than 2% of buildings will be 15 units tall
+	if (probabilityCheck >= 2 && probabilityCheck < 30) randomFactor = rand() % 7; // around 28% of the city will be buildings that are between 3 to 5 units tall
+	if (probabilityCheck >= 30 && probabilityCheck < 50) randomFactor = rand() % 6; // around 20% of the city will be buildings that are between 4 to 6 units tall
+	if (probabilityCheck >= 50) randomFactor = rand() % 5; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
+
+	glBindVertexArray(cubeModelVAO);
+
+	// Assign texture to the car body
+	glBindTexture(GL_TEXTURE_2D, redTexture);
+	glUniform1i(textureLocation, 1);
+
+	vec3 finalPosition = vec3(position.x, position.y + (0.1 * (1 + randomFactor)) / 2, position.z);
+
+	//Car Base
+	mat4 carBase = translate(mat4(1.0f), finalPosition) 
+		* scale(mat4(1.0f), vec3(tileSize / 2, 0.25f, tileSize / 3));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &carBase[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+
+	glBindTexture(GL_TEXTURE_2D, blackTexture);
+
+	//Car Hood
+	mat4 carHood = carBase * translate(mat4(1.0f), vec3(-0.15f, 1.4f, 0.0f)) * scale(mat4(1.0f), vec3(0.6f, 0.2f, 1.0f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &carHood[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+
+	glBindTexture(GL_TEXTURE_2D, whiteTexture);
+
+	//Wheel rim front
+	mat4 wheels = carBase * translate(mat4(1.0f), vec3(0.35f, 0.06f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.12f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+
+	//Wheel rim back
+	wheels = carBase * translate(mat4(1.0f), vec3(-0.35f, 0.06f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.12f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+
+	//Mirrors
+	wheels = carBase * translate(mat4(1.0f), vec3(0.1f, 0.22f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 1.2f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+
+	//strip R
+	wheels = carBase * translate(mat4(1.0f), vec3(0.35f, 0.35f, 0.2f)) * scale(mat4(1.0f), vec3(0.25f, 0.4f, 0.1f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+
+	//strip L
+	wheels = carBase * translate(mat4(1.0f), vec3(0.35f, 0.35f, -0.2f)) * scale(mat4(1.0f), vec3(0.25f, 0.4f, 0.1f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+
+	glBindTexture(GL_TEXTURE_2D, headlightTexture);
+
+	//Headlights R
+	wheels = carBase * translate(mat4(1.0f), vec3(0.48f, 0.2f, 0.35f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 0.15f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+
+	//Headlights L
+	wheels = carBase * translate(mat4(1.0f), vec3(0.48f, 0.2f, -0.35f)) * scale(mat4(1.0f), vec3(0.1f, 0.4f, 0.15f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+
+	glBindTexture(GL_TEXTURE_2D, glassTexture);
+
+	//SkateBase3
+	 carHood = carBase * translate(mat4(1.0f), vec3(-0.15f, 0.9f, 0.0f)) * scale(mat4(1.0f), vec3(0.6f, 0.8f, 1.0f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &carHood[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+	
+	glBindTexture(GL_TEXTURE_2D, tireTexture);
+
+	//Wheel front
+	 wheels = carBase * translate(mat4(1.0f), vec3(0.35f, -0.05f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.0f, 1.1f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+
+	//Wheel back
+	wheels = carBase * translate(mat4(1.0f), vec3(-0.35f, -0.05f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 1.0f, 1.1f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+
+	glBindTexture(GL_TEXTURE_2D, blackTexture);
+
+	//rim up
+	wheels = carBase * translate(mat4(1.0f), vec3(0.47f, 0.16f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.15f, 0.5f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+
+	//rim down
+	wheels = carBase * translate(mat4(1.0f), vec3(0.47f, -0.2f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 0.1f, 0.5f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &wheels[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices, starting at index 0
+}
+
+void DrawLamp(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
+{
+
+	int probabilityCheck = rand() % 100; // Variable to help us adjust what numbers spawn more often and what numbers spawn less often. 
+	int randomFactor = 0; // The random factor which affects the scale of the building.// = rand() % 11; 
+	if (probabilityCheck < 2) randomFactor = 9; // less than 2% of buildings will be 15 units tall
+	if (probabilityCheck >= 2 && probabilityCheck < 30) randomFactor = rand() % 7; // around 28% of the city will be buildings that are between 3 to 5 units tall
+	if (probabilityCheck >= 30 && probabilityCheck < 50) randomFactor = rand() % 6; // around 20% of the city will be buildings that are between 4 to 6 units tall
+	if (probabilityCheck >= 50) randomFactor = rand() % 5; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
+
+	glBindVertexArray(cubeModelVAO);
+
+	vec3 finalPosition = vec3(position.x, position.y + (0.1 * (1 + randomFactor)) / 2, position.z);
+
+	// Assign texture to the building
+	glBindTexture(GL_TEXTURE_2D, blackTexture);
+	glUniform1i(textureLocation, 1);
+
+	//Lamp Base
+	mat4 lampBase = translate(mat4(1.0f), finalPosition)
+		* scale(mat4(1.0f), vec3(tileSize / 16, 26.4f, tileSize / 16));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampBase[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	//Lamp Hat
+	mat4 lampHat = lampBase * translate(mat4(1.0f), vec3(0.0f, 0.5f, 0.0f)) * scale(mat4(1.0f), vec3(3.0f, 0.02f, 3.0f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampHat[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	//Lamp pike
+	lampHat = lampBase * translate(mat4(1.0f), vec3(0.0f, 0.55f, 0.0f)) * scale(mat4(1.0f), vec3(0.5f, 0.08f, 0.5f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampHat[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	//Lamp pike 2
+	lampHat = lampBase * translate(mat4(1.0f), vec3(0.0f, 0.44f, 0.0f)) * scale(mat4(1.0f), vec3(2.5f, 0.01f, 2.5f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampHat[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	glBindTexture(GL_TEXTURE_2D, headlightTexture);
+
+	//Lamp Hood
+	mat4 lampHood = lampBase * translate(mat4(1.0f), vec3(0.0f, 0.48f, 0.0f)) * scale(mat4(1.0f), vec3(2.0f, 0.06f, 2.0f));
+	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampHood[0][0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+}
