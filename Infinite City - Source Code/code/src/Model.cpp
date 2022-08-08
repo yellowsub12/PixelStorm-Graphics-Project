@@ -839,7 +839,14 @@ void DrawCar(vec3 position, float tileSize, int orientation, GLuint worldMatrixL
 	glBindVertexArray(cubeModelVAO);
 
 	// Assign texture to the car body
-	glBindTexture(GL_TEXTURE_2D, redTexture);
+	switch (rand() % 5)
+	{
+	case 0:glBindTexture(GL_TEXTURE_2D, redTexture); break;
+	case 1:glBindTexture(GL_TEXTURE_2D, blackTexture); break;
+	case 2:glBindTexture(GL_TEXTURE_2D, cloth2Texture); break;
+	case 3:glBindTexture(GL_TEXTURE_2D, cloth3Texture); break;
+	case 4:glBindTexture(GL_TEXTURE_2D, cloth4Texture); break;
+	}
 	glUniform1i(textureLocation, 1);
 
 	vec3 finalPosition = vec3(position.x, position.y + (1.0f), position.z);
