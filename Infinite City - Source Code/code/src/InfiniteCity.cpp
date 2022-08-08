@@ -468,8 +468,6 @@ void InfiniteCity::DrawCity(GLFWwindow* window, GLuint sceneShaderProgram, GLuin
        glClearColor(0.5f, 0.5f, 1.0f, 1.0f);
        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(sceneShaderProgram);
-
 
         // Setting the values of ambient, diffuse and specular strengths in the activeShader
         glUniform1f(glGetUniformLocation(sceneShaderProgram, "ambientStrength"), ambient);

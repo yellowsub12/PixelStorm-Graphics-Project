@@ -149,19 +149,14 @@ void Draw(vec3 position, float tileSize, int blockType, bool roadTile, int orien
 		random_integer = lowest + rand() % range;
 		if (roadTile)
 		{
-			if (random_integer == 1) {
-				int r2 = rand() % 4;
-				//if(r2 == 3)
-					//DrawBus(position, tileSize, orientation, worldMatrixLocation, textureLocation);
-			}
 			if (random_integer == 2)
 			{
 				if (orientation != 0)
 				{
-					int r2 = rand() % 5;
+					int r2 = rand() % 10;
 					if (r2 <= 2)
 						DrawCar(position, tileSize, orientation, worldMatrixLocation, textureLocation);
-					else
+					else if (r2 <= 5)
 						DrawBus(position, tileSize, orientation, worldMatrixLocation, textureLocation);
 				}
 			}
