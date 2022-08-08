@@ -125,7 +125,7 @@ void Draw(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocati
 		int range = (highest - lowest) + 1;
 		random_integer = lowest + rand() % range;
 		if (random_integer == 1) {
-			DrawHuman(position, tileSize, worldMatrixLocation, textureLocation);
+			DrawTree(position, tileSize, worldMatrixLocation, textureLocation);
 		}
 		if (random_integer == 2)
 		{
@@ -171,7 +171,7 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 	glBindVertexArray(cubeModelVAO);
 
 	int random_integer;
-	int lowest = 1, highest = 6;
+	int lowest = 1, highest = 8;
 	int range = (highest - lowest) + 1;
 	random_integer = lowest + rand() % range;
 
@@ -239,6 +239,40 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 			* scale(mat4(1.0f), vec3(tileSize * 0.28 + (0.08 * (randomFactor)), tileSize * 0.10 + (0.012 * (randomFactor)), tileSize * 0.28 + (0.08 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
 
 		glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesMiddleWorldMatrix[0][0]);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
+	if (random_integer >= 5) {
+		glBindTexture(GL_TEXTURE_2D, leavesTexture);
+		mat4 leavesCornerWorldMatrix = translate(mat4(1.0f), vec3(position.x + 2.0, (position.y + (0.1 * (8 + randomFactor)) * tileSize / 2), position.z + 0.5))
+			* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f / 2)), vec3(0.0f, 1.0f, 0.0f))
+			* scale(mat4(1.0f), vec3(tileSize * 0.13 + (0.012 * (randomFactor)), tileSize * 0.13 + (0.012 * (randomFactor)), tileSize * 0.13 + (0.012 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
+
+		glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesCornerWorldMatrix[0][0]);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
+	if (random_integer >= 6) {
+		glBindTexture(GL_TEXTURE_2D, leavesTexture);
+		mat4 leaveslowerCornerWorldMatrix = translate(mat4(1.0f), vec3(position.x - 2.0, (position.y + (0.1 * (3 + randomFactor)) * tileSize / 2), position.z - 0.5))
+			* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f / 2)), vec3(0.0f, 1.0f, 0.0f))
+			* scale(mat4(1.0f), vec3(tileSize * 0.11 + (0.012 * (randomFactor)), tileSize * 0.11 + (0.010 * (randomFactor)), tileSize * 0.11 + (0.012 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
+
+		glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leaveslowerCornerWorldMatrix[0][0]);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
+
+	if (random_integer >= 7) {
+		glBindTexture(GL_TEXTURE_2D, leavesTexture);
+		mat4 leavesSideMiddleWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (5 + randomFactor)) * tileSize / 2), position.z + 2))
+			* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f / 2)), vec3(0.0f, 1.0f, 0.0f))
+			* scale(mat4(1.0f), vec3(tileSize * 0.2 + (0.08 * (randomFactor)), tileSize * 0.09 + (0.012 * (randomFactor)), tileSize * 0.2 + (0.08 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
+
+		glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesSideMiddleWorldMatrix[0][0]);
 
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
