@@ -19,7 +19,7 @@ void Draw(vec3 position, float tileSize, int blockType, bool roadType, int orien
 
 void DrawTile(vec3 position, float tileSize, int blockType, GLuint worldMatrixLocation, GLuint textureLocation, GLuint shaderProgram);
 
-void DrawBuilding(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
+void DrawBuilding(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation, GLuint shaderProgram);
 
 void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation);
 

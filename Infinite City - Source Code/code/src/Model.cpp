@@ -52,9 +52,27 @@ GLuint cloth3Texture = 0;
 GLuint cloth4Texture = 0;
 
 unsigned int humanHeadTexture1;
+unsigned int cubeBuildingTexture1;
+unsigned int cubeBuildingTexture2;
+unsigned int cubeBuildingTexture3;
 
 vec3 playerPosition = vec3(0.0f);
 bool isPlayerColliding = false;
+
+vector<std::string> returnBuildingVector(int index)
+{
+	std::string sIndex = std::to_string(index);
+	vector<std::string> buildingTextureVector = {
+		texturesPathPrefix + "Buildings/right" + sIndex + ".png",
+		texturesPathPrefix + "Buildings/left" + sIndex + ".png",
+		texturesPathPrefix + "Buildings/top" + sIndex + ".png",
+		texturesPathPrefix + "Buildings/bottom" + sIndex + ".png",
+		texturesPathPrefix + "Buildings/front" + sIndex + ".png",
+		texturesPathPrefix + "Buildings/back" + sIndex + ".png"
+	};
+
+	return buildingTextureVector;
+}
 
 void Initialize()
 {
@@ -67,7 +85,12 @@ void Initialize()
 		texturesPathPrefix + "HumanHead/back.png"
 	};
 
+
 	humanHeadTexture1 = loadCubemap(humanHead1);
+	cubeBuildingTexture1 = loadCubemap(returnBuildingVector(1));
+	cubeBuildingTexture2 = loadCubemap(returnBuildingVector(2));
+	cubeBuildingTexture3 = loadCubemap(returnBuildingVector(3));
+
 
 	cubeModelVAO = createUnitCube(false);
 	planeVAO = createUnitPlane();
@@ -166,7 +189,7 @@ void Draw(vec3 position, float tileSize, int blockType, bool roadTile, int orien
 			if (rand() % 5 <= 2)
 				DrawTile(position, tileSize, blockType, worldMatrixLocation, textureLocation, shaderProgram);
 			else
-				DrawBuilding(position, tileSize, worldMatrixLocation, textureLocation);
+				DrawBuilding(position, tileSize, worldMatrixLocation, textureLocation, shaderProgram);
 		}
 		
 	}
@@ -196,7 +219,7 @@ void DrawTile(vec3 position, float tileSize, int blockType, GLuint worldMatrixLo
 		{
 			
 			vec3 finalPosition = vec3(position.x + i*(5+rand()%5), position.y, position.z + j * (5 + rand() % 5));
-			int randomFactor = rand() % 13;
+			int randomFactor = rand() % 18;
 		
 				if (randomFactor < 2)
 					DrawHuman(finalPosition, tileSize, worldMatrixLocation, textureLocation, shaderProgram);
@@ -204,32 +227,45 @@ void DrawTile(vec3 position, float tileSize, int blockType, GLuint worldMatrixLo
 					DrawTrashBin(finalPosition, tileSize, worldMatrixLocation, textureLocation);
 				else if (randomFactor >= 4 && randomFactor <= 5)
 					DrawBench(finalPosition, tileSize, worldMatrixLocation, textureLocation);
-				else if (randomFactor > 5 && randomFactor < 10)
-					DrawTree(finalPosition, tileSize, worldMatrixLocation, textureLocation);		
+				else if (randomFactor > 5 && randomFactor < 9)
+					DrawTree(finalPosition, tileSize, worldMatrixLocation, textureLocation);
+				else if (randomFactor >= 9 && randomFactor < 11)
+					DrawPhonebooth(finalPosition, tileSize, worldMatrixLocation, textureLocation);
+				else if (randomFactor == 12)
+					DrawLamp(finalPosition, tileSize, worldMatrixLocation, textureLocation);
 
 		}
 	}
 }
 
-void DrawBuilding(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
+void DrawBuilding(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation, GLuint shaderProgram)
 {
 	int probabilityCheck = rand() % 100; // Variable to help us adjust what numbers spawn more often and what numbers spawn less often. 
 	int randomFactor = 0; // The random factor which affects the scale of the building.// = rand() % 11; 
 	if (probabilityCheck < 2) randomFactor = 15; // less than 2% of buildings will be 15 units tall
 	if (probabilityCheck >= 2 && probabilityCheck < 30) randomFactor = 1 + rand() % 2; // around 28% of the city will be buildings that are between 3 to 5 units tall
-	if (probabilityCheck >= 30 && probabilityCheck < 50) randomFactor = rand() % 2 + 4; // around 20% of the city will be buildings that are between 4 to 6 units tall
-	if (probabilityCheck >= 50) randomFactor = rand() % 2 + 3; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
+	if (probabilityCheck >= 30 && probabilityCheck < 50) randomFactor = rand() % 2 + 2; // around 20% of the city will be buildings that are between 4 to 6 units tall
+	if (probabilityCheck >= 50) randomFactor = rand() % 2 + 1; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
 
 	glBindVertexArray(cubeModelVAO);
 
 	// Assign texture to the building
-	if(rand() % 2 == 0)
-		glBindTexture(GL_TEXTURE_2D, buildingTexture);
-	else
-		glBindTexture(GL_TEXTURE_2D, buildingTexture2);
-	glUniform1i(textureLocation, 1);
+	glActiveTexture(GL_TEXTURE0 + 2);
+	GLuint textureLocationCube = glGetUniformLocation(shaderProgram, "actualCubeTexture");
 
-	vec3 finalPosition = vec3(position.x, position.y + (0.5 * (1 + randomFactor)) / 2, position.z);
+	int randomChoice = rand() % 5;
+	if(randomChoice < 2)
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeBuildingTexture1);
+	else if (randomChoice < 4)
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeBuildingTexture2);
+	else if (randomChoice == 4)
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeBuildingTexture3);
+	
+	glUniform1i(textureLocationCube, 2);
+
+	glUniform1i(glGetUniformLocation(shaderProgram, "applyCubeTexture"), true);
+
+	vec3 finalPosition = vec3(position.x, position.y + (randomFactor * tileSize) / 2, position.z);
 
 	mat4 tileWorldMatrix = translate(mat4(1.0f), finalPosition)
 		* scale(mat4(1.0f), vec3(tileSize, randomFactor*tileSize, tileSize)); //(0.5*(1+randomFactor))+scaleOffset
@@ -238,7 +274,10 @@ void DrawBuilding(vec3 position, float tileSize, GLuint worldMatrixLocation, GLu
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	CollisionCheck(finalPosition, vec3(tileSize, randomFactor * tileSize, tileSize), 0);
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glUniform1i(glGetUniformLocation(shaderProgram, "applyCubeTexture"), false);
+
+	CollisionCheck(finalPosition, vec3(tileSize, randomFactor * tileSize + 10, tileSize), worldMatrixLocation);
 }
 
 void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation)
@@ -252,6 +291,11 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 
 	glBindVertexArray(cubeModelVAO);
 
+	int random_integer;
+	int lowest = 1, highest = 8;
+	int range = (highest - lowest) + 1;
+	random_integer = lowest + rand() % range;
+
 	// Assign texture to the building
 	glBindTexture(GL_TEXTURE_2D, treeTexture);
 	glUniform1i(textureLocation, 1);
@@ -259,18 +303,16 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 	vec3 finalPosition = vec3(position.x, position.y + (0.1 * (3 + randomFactor)) / 2, position.z);
 
 	mat4 tileWorldMatrix = translate(mat4(1.0f), finalPosition)
-		* scale(mat4(1.0f), vec3(tileSize * 0.05, (0.1 * (5 + randomFactor))*tileSize, tileSize * 0.05)); //(0.5*(1+randomFactor))+scaleOffset
-
-	CollisionCheck(finalPosition, vec3(tileSize * 0.05, (0.1 * (5 + randomFactor)) * tileSize, tileSize * 0.05), 0);
+		* scale(mat4(1.0f), vec3(tileSize * 0.05, (0.1 * (5 + randomFactor)) * tileSize, tileSize * 0.05)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &tileWorldMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	glBindTexture(GL_TEXTURE_2D, leavesTexture);
-	mat4 leavesWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (5 + randomFactor))*tileSize/2), position.z))
-		* rotate(mat4(1.0f), 0.05f*sinf(2*glfwGetTime()), vec3(0.0f, 1.0f, 0.0f))
-		* scale(mat4(1.0f), vec3(tileSize * 0.2 + (0.05 * ( randomFactor)), tileSize * 0.2 + (0.025 * ( randomFactor)), tileSize * 0.2 + (0.05 * ( randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
+	mat4 leavesWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (5 + randomFactor)) * tileSize / 2), position.z))
+		* rotate(mat4(1.0f), 0.05f * sinf(2 * glfwGetTime()), vec3(0.0f, 1.0f, 0.0f))
+		* scale(mat4(1.0f), vec3(tileSize * 0.2 + (0.05 * (randomFactor)), tileSize * 0.2 + (0.025 * (randomFactor)), tileSize * 0.2 + (0.05 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesWorldMatrix[0][0]);
 
@@ -279,22 +321,86 @@ void DrawTree(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 	// Upper part
 	glBindTexture(GL_TEXTURE_2D, leavesTexture);
 	mat4 leavesUpperWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (7 + randomFactor)) * tileSize / 2), position.z))
-		* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f/2)), vec3(0.0f, 1.0f, 0.0f))
+		* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f / 2)), vec3(0.0f, 1.0f, 0.0f))
 		* scale(mat4(1.0f), vec3(tileSize * 0.15 + (0.05 * (randomFactor)), tileSize * 0.15 + (0.025 * (randomFactor)), tileSize * 0.15 + (0.05 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesUpperWorldMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	// Upper upper part
-	glBindTexture(GL_TEXTURE_2D, leavesTexture);
-	mat4 leavesUpperUpperWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (9 + randomFactor)) * tileSize / 2), position.z))
-		* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f/3)), vec3(0.0f, 1.0f, 0.0f))
-		* scale(mat4(1.0f), vec3(tileSize * 0.075 + (0.05 * (randomFactor)), tileSize * 0.075 + (0.025 * (randomFactor)), tileSize * 0.075 + (0.05 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
+	if (random_integer >= 2) {
+		// Upper upper part
+		glBindTexture(GL_TEXTURE_2D, leavesTexture);
+		mat4 leavesUpperUpperWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (9 + randomFactor)) * tileSize / 2), position.z))
+			* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f / 3)), vec3(0.0f, 1.0f, 0.0f))
+			* scale(mat4(1.0f), vec3(tileSize * 0.075 + (0.05 * (randomFactor)), tileSize * 0.075 + (0.025 * (randomFactor)), tileSize * 0.075 + (0.05 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
 
-	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesUpperUpperWorldMatrix[0][0]);
+		glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesUpperUpperWorldMatrix[0][0]);
 
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
+	if (random_integer >= 3) {
+		// Lower part
+		glBindTexture(GL_TEXTURE_2D, leavesTexture);
+		mat4 leavesLowerWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (3 + randomFactor)) * tileSize / 2), position.z))
+			* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f / 2)), vec3(0.0f, 1.0f, 0.0f))
+			* scale(mat4(1.0f), vec3(tileSize * 0.15 + (0.05 * (randomFactor)), tileSize * 0.16 + (0.025 * (randomFactor)), tileSize * 0.15 + (0.05 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
+
+		glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesLowerWorldMatrix[0][0]);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
+
+	if (random_integer >= 4) {
+		glBindTexture(GL_TEXTURE_2D, leavesTexture);
+		mat4 leavesMiddleWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (5 + randomFactor)) * tileSize / 2), position.z))
+			* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f / 2)), vec3(0.0f, 1.0f, 0.0f))
+			* scale(mat4(1.0f), vec3(tileSize * 0.28 + (0.08 * (randomFactor)), tileSize * 0.10 + (0.012 * (randomFactor)), tileSize * 0.28 + (0.08 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
+
+		glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesMiddleWorldMatrix[0][0]);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
+	if (random_integer >= 5) {
+		glBindTexture(GL_TEXTURE_2D, leavesTexture);
+		mat4 leavesCornerWorldMatrix = translate(mat4(1.0f), vec3(position.x + 2.0, (position.y + (0.1 * (8 + randomFactor)) * tileSize / 2), position.z + 0.5))
+			* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f / 2)), vec3(0.0f, 1.0f, 0.0f))
+			* scale(mat4(1.0f), vec3(tileSize * 0.13 + (0.012 * (randomFactor)), tileSize * 0.13 + (0.012 * (randomFactor)), tileSize * 0.13 + (0.012 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
+
+		glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesCornerWorldMatrix[0][0]);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
+	if (random_integer >= 6) {
+		glBindTexture(GL_TEXTURE_2D, leavesTexture);
+		mat4 leaveslowerCornerWorldMatrix = translate(mat4(1.0f), vec3(position.x - 2.0, (position.y + (0.1 * (3 + randomFactor)) * tileSize / 2), position.z - 0.5))
+			* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f / 2)), vec3(0.0f, 1.0f, 0.0f))
+			* scale(mat4(1.0f), vec3(tileSize * 0.11 + (0.012 * (randomFactor)), tileSize * 0.11 + (0.010 * (randomFactor)), tileSize * 0.11 + (0.012 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
+
+		glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leaveslowerCornerWorldMatrix[0][0]);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
+
+	if (random_integer >= 7) {
+		glBindTexture(GL_TEXTURE_2D, leavesTexture);
+		mat4 leavesSideMiddleWorldMatrix = translate(mat4(1.0f), vec3(position.x, (position.y + (0.1 * (5 + randomFactor)) * tileSize / 2), position.z + 2))
+			* rotate(mat4(1.0f), 0.05f * sinf((2 * glfwGetTime()) + (3.14159f / 2)), vec3(0.0f, 1.0f, 0.0f))
+			* scale(mat4(1.0f), vec3(tileSize * 0.2 + (0.08 * (randomFactor)), tileSize * 0.09 + (0.012 * (randomFactor)), tileSize * 0.2 + (0.08 * (randomFactor)))); //(0.5*(1+randomFactor))+scaleOffset
+
+		glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &leavesSideMiddleWorldMatrix[0][0]);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
+	CollisionCheck(finalPosition, vec3(tileSize * 0.05, (0.1 * (5 + randomFactor)) * tileSize, tileSize * 0.05), 0);
+
+
 
  }
 
@@ -401,6 +507,8 @@ void DrawPhonebooth(vec3 position, float tileSize, GLuint worldMatrixLocation, G
 	mat4 phoneboothWorldMatrix = translate(mat4(1.0f), vec3(position.x, position.y+1.75, position.z)) * rotate(mat4(1.0f), 3.14159f, vec3(1.0f, 0.0f, 0.0f))
 		* scale(mat4(1.0f), vec3(1.5, 3.5, 1.5)); //(0.5*(1+randomFactor))+scaleOffset
 
+	CollisionCheck(vec3(position.x, position.y, position.z), vec3(1.5, 4.0, 1.5), 0);
+
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &phoneboothWorldMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -430,13 +538,10 @@ void DrawPhonebooth(vec3 position, float tileSize, GLuint worldMatrixLocation, G
 
 void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint textureLocation, GLuint shaderProgram)
 {
-	int probabilityCheck = rand() % 100; // Variable to help us adjust what numbers spawn more often and what numbers spawn less often. 
-	int randomBusFactor = 9; // The random factor which affects the scale of the building.// = rand() % 11; 
-	int randomFactor = 6;
-	if (probabilityCheck < 2) randomBusFactor = 7; // less than 2% of buildings will be 15 units tall
-	if (probabilityCheck >= 2 && probabilityCheck < 30) randomBusFactor = rand() % 9; // around 28% of the city will be buildings that are between 3 to 5 units tall
-	if (probabilityCheck >= 30 && probabilityCheck < 50) randomBusFactor = rand() % 10; // around 20% of the city will be buildings that are between 4 to 6 units tall
-	if (probabilityCheck >= 50) randomBusFactor = rand() % 8; // Lastly, the remaining 50% of buildings will be about 1 to 2 units tall. 
+	double randomHumanFactor;
+	double lowest = 2, highest = 4;
+	int range = (highest - lowest) + 1;
+	randomHumanFactor = lowest + rand() % range;
 
 	glBindVertexArray(cubeModelVAO);
 
@@ -446,6 +551,8 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 
 
 	vec3 finalPosition = vec3(position.x, position.y, position.z);
+
+
 
 	// Chest
 	switch (rand() % 5)
@@ -462,16 +569,12 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 
 	initialRotation = rotate(mat4(1.0f), 1.5708f * (-1 + r1), vec3(0.0f, 1.0f, 0.0f));
 
-	mat4 BodyMatrix = initialPosition * translate(mat4(1.0f), vec3(position.x, position.y + 2.0, position.z)) 
-		* initialRotation
-		* initialScale
-		* scale(mat4(1.0f), vec3(0.35, 0.5, 0.15)*2.5f) ; //(0.5*(1+randomFactor))+scaleOffset
+	mat4 BodyMatrix = initialPosition * translate(mat4(1.0f), vec3(position.x, randomHumanFactor * 0.8 * 0.6 , position.z)) * initialRotation
+		* scale(mat4(1.0f), vec3(0.35 * randomHumanFactor * 0.6, 0.5 * randomHumanFactor * 0.6, 0.15 * randomHumanFactor * 0.6)) * initialScale; //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &BodyMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-
-	CollisionCheck(vec3(position.x, position.y, position.z), vec3(0.35, 2.0, 0.35) * 2.5f, 0);
 
 
 	// Arms 1 Left
@@ -485,14 +588,16 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 	}
 	glUniform1i(textureLocation, 1);
 
-	mat4 armLeftWorldMatrix = BodyMatrix * translate(mat4(1.0f), vec3(0.65, -0.03, 0))
+	mat4 armLeftWorldMatrix = BodyMatrix * translate(mat4(1.0f), vec3(0.65, -0.03*sinf(2*glfwGetTime()), 0))
 		* scale(mat4(1.0f), vec3(0.29, 1.03, 1.0)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &armLeftWorldMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	mat4 armRightWorldMatrix = BodyMatrix * translate(mat4(1.0f), vec3(-0.65, -0.03, 0))
+	// Arms 2 Right
+
+	mat4 armRightWorldMatrix = BodyMatrix * translate(mat4(1.0f), vec3(-0.65, -0.03 * sinf(2 * glfwGetTime()), 0))
 		* scale(mat4(1.0f), vec3(0.29, 1.03, 1.0)); //(0.5*(1+randomFactor))+scaleOffset
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &armRightWorldMatrix[0][0]);
@@ -509,9 +614,8 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 	case 4:glBindTexture(GL_TEXTURE_2D, cloth4Texture); break;
 	}
 	glUniform1i(textureLocation, 1);
-	glUniform1i(textureLocation, 1);
 
-	mat4 legLeftWorldMatrix = BodyMatrix * translate(mat4(1.0f), vec3(0.26, -1.02, 0)) *  rotate(mat4(1.0f), 3.14159f, vec3(1.0f, 0.0f, 0.0f))
+	mat4 legLeftWorldMatrix = BodyMatrix * translate(mat4(1.0f), vec3(0.26, -1.02, 0)) * rotate(mat4(1.0f), 3.14159f, vec3(1.0f, 0.0f, 0.0f))
 		* scale(mat4(1.0f), vec3(0.43, 1.03, 1.0)); //(0.5*(1+randomFactor))+scaleOffset
 
 
@@ -528,16 +632,24 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
+
+	// Head
 	glActiveTexture(GL_TEXTURE0 + 2);
 	GLuint textureLocationCube = glGetUniformLocation(shaderProgram, "actualCubeTexture");
 	glBindTexture(GL_TEXTURE_CUBE_MAP, humanHeadTexture1);
 	glUniform1i(textureLocationCube, 2);
 
 	glUniform1i(glGetUniformLocation(shaderProgram, "applyCubeTexture"), true);
-	;
 
-	mat4 headWorldMatrix = BodyMatrix *  translate(mat4(1.0f), vec3(0, 0.75, -0.05))
-		* scale(mat4(1.0f), vec3(0.8, 0.5, 1.6)); //(0.5*(1+randomFactor))+scaleOffset
+	mat4 headRotation = mat4(1.0f);
+
+	//if (rand() % 2 == 0)
+		headRotation = rotate(mat4(1.0f), 0.2f * sinf((rand() % 3) * glfwGetTime()), vec3(0.0f, 1.0f, 0.0f));
+
+	mat4 headWorldMatrix = BodyMatrix * translate(mat4(1.0f), vec3(0, 0.75, -0.05))
+		* scale(mat4(1.0f), vec3(0.8, 0.5, 1.6))
+		* headRotation;//(0.5*(1+randomFactor))+scaleOffset
+
 
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &headWorldMatrix[0][0]);
 
@@ -546,7 +658,17 @@ void DrawHuman(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint
 	glActiveTexture(GL_TEXTURE0 + 1);
 	glUniform1i(glGetUniformLocation(shaderProgram, "applyCubeTexture"), false);
 
+	CollisionCheck(vec3(position.x, position.y, position.z), vec3(0.35, 2.0, 0.35) * 2.5f, 0);
+
 }
+
+
+
+
+
+
+
+
 
 
 void DrawBus(vec3 position, float tileSize, int orientation, GLuint worldMatrixLocation, GLuint textureLocation)
@@ -1018,6 +1140,8 @@ void DrawLamp(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
+	CollisionCheck(finalPosition, vec3(tileSize / 16, 26.4f, tileSize / 16), 0);
+
 	//Lamp Hat
 	mat4 lampHat = lampBase * translate(mat4(1.0f), vec3(0.0f, 0.5f, 0.0f)) * scale(mat4(1.0f), vec3(3.0f, 0.02f, 3.0f));
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampHat[0][0]);
@@ -1039,10 +1163,12 @@ void DrawLamp(vec3 position, float tileSize, GLuint worldMatrixLocation, GLuint 
 	glBindTexture(GL_TEXTURE_2D, headlightTexture);
 
 	//Lamp Hood
-	mat4 lampHood = lampBase * translate(mat4(1.0f), vec3(0.0f, 0.48f, 0.0f)) * scale(mat4(1.0f), vec3(2.0f, 0.06f, 2.0f));
+	mat4 lampHood = lampBase * translate(mat4(1.0f), vec3(0.0f, 0.48f, 0.0f)) * scale(mat4(1.0f), vec3(2.0f, 0.058f, 2.0f));
 	glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampHood[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
 
 	
 
@@ -1055,13 +1181,13 @@ void CollisionCheck(vec3 position, vec3 scale, GLuint worldMatrixLocation)
 	float collisionOffset = 1.0f;
 	vec3 futureCamPosition = Camera::position + Camera::movementVector;
 	vec3 checkVector = vec3(futureCamPosition.x, futureCamPosition.y - 5.0f, futureCamPosition.z);
-	checkX = checkVector.x < (position.x + (scale.x) / 2 + collisionOffset) && checkVector.x >(position.x - (scale.x) / 2 - collisionOffset);
-	checkY = checkVector.y < (position.y + (scale.y) / 2 + collisionOffset) && checkVector.y >(position.y - (scale.y) / 2 - collisionOffset);
-	checkZ = checkVector.z < (position.z + (scale.z) / 2 + collisionOffset) && checkVector.z >(position.z - (scale.z) / 2 - collisionOffset);
+	checkX = checkVector.x < (position.x + (scale.x) / 2 + collisionOffset) && checkVector.x > (position.x - (scale.x) / 2 - collisionOffset);
+	checkY = checkVector.y < (position.y + (scale.y) / 2 + collisionOffset) && checkVector.y > (position.y - (scale.y) / 2 - collisionOffset);
+	checkZ = checkVector.z < (position.z + (scale.z) / 2 + collisionOffset) && checkVector.z > (position.z - (scale.z) / 2 - collisionOffset);
 
 	//mat4 lampHood = translate(mat4(1.0f), position) * glm::scale(mat4(1.0f), scale);
 	//glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &lampHood[0][0]);
-
+	//
 	//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	if (checkX && checkY && checkZ)
